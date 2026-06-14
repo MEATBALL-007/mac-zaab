@@ -1,0 +1,19 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Local tooling / agent config (not needed in the repo)
+.claude/
+
+# Node (none used, but just in case)
+node_modules/
+
+# Scratch / temp test artifacts
+__*.png
+__*.html
+__*.js
+
+# Stray notes / placeholder text files (not part of the deliverable)
+*.txt
