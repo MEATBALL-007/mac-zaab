@@ -21,7 +21,7 @@ const MIME = {
 
 http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split('?')[0]);
-  if (p === '/') p = '/MAC_ZAAB_presentation_cdn.html';
+  if (p === '/') p = '/index.html';   // matches GitHub Pages (serves index.html at root)
   const file = path.join(ROOT, path.normalize(p).replace(/^(\.\.[/\\])+/, ''));
   if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end('Forbidden'); }
   fs.readFile(file, (err, data) => {
