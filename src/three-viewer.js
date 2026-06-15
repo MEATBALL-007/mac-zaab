@@ -73,6 +73,8 @@
     var key1 = new THREE.DirectionalLight(0xffffff, 1.6); key1.position.set(2.5, 4, 2.5); scene.add(key1);
     var key2 = new THREE.DirectionalLight(0xfff2d8, 0.5); key2.position.set(-3, 2, -2); scene.add(key2);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x9a8f78, 0.35));
+    // warm "kicker" rim light that slowly orbits the model (cinematic specular travel)
+    var rim = new THREE.DirectionalLight(0xffd9a0, 0.6); rim.position.set(-3, 3.2, -3); scene.add(rim);
 
     var camera = new THREE.PerspectiveCamera(34, 1, 0.01, 1000);
     camera.position.set(0, 1, 4);
@@ -89,7 +91,7 @@
     var pivot = new THREE.Group();
     scene.add(pivot);
 
-    V.renderer = renderer; V.scene = scene; V.camera = camera; V.controls = controls; V.pivot = pivot;
+    V.renderer = renderer; V.scene = scene; V.camera = camera; V.controls = controls; V.pivot = pivot; V.rim = rim;
 
     controls.addEventListener('start', function () { V.idle = false; });
     controls.addEventListener('end', function () { V.idle = true; });
@@ -125,6 +127,9 @@
       controls.maxDistance = dist * 1.9;
       controls.update();
 
+      // remember the framed "beauty shot" so reveals can dolly into it
+      V.beauty = { pos: camera.position.clone(), tgt: controls.target.clone() };
+
       var sr = Math.max(size.x, size.z) * 0.85 + 0.001;
       var sh = new THREE.Mesh(
         new THREE.PlaneGeometry(sr * 2.2, sr * 2.2),
@@ -158,6 +163,23 @@
     V.revealed = true;
     V.revealT = 0;
     V.revealStart = perf();
+    startDolly(V);
+  }
+
+  /* Cinematic push-in: start wide/high, ease into the framed beauty shot. */
+  function startDolly(V) {
+    if (!V.beauty || reduced()) return;
+    var b = V.beauty;
+    var dir = b.pos.clone().sub(b.tgt);          // target -> camera
+    var dist = dir.length();
+    var from = b.tgt.clone().add(dir.multiplyScalar(1.55));
+    from.y += dist * 0.10;
+    from.x += dist * 0.12;
+    V.camFrom = from;
+    V.camera.position.copy(from);
+    V.camera.lookAt(b.tgt);
+    V.controls.enabled = false;
+    V.dolly = true; V.dollyStart = perf(); V.dollyDur = 1500;
   }
 
   function spin(V) {
@@ -199,7 +221,27 @@
         V.pivot.rotation.y += IDLE_RPS * dt;
       }
 
-      V.controls.update();
+      // orbiting warm rim light + cinema exposure grade
+      if (V.rim) {
+        if (!reduced()) { var a = now * 0.00035; V.rim.position.set(Math.cos(a) * 4, 3.2, Math.sin(a) * 4); }
+        V.rim.intensity = document.body.classList.contains('cinema') ? 0.95 : 0.55;
+      }
+      V.renderer.toneMappingExposure = document.body.classList.contains('cinema') ? 1.28 : 1.1;
+
+      if (V.dolly && V.camFrom && V.beauty) {
+        var dp = Math.min((now - V.dollyStart) / V.dollyDur, 1);
+        var de = 1 - Math.pow(1 - dp, 3);
+        V.camera.position.lerpVectors(V.camFrom, V.beauty.pos, de);
+        V.camera.lookAt(V.beauty.tgt);
+        if (dp >= 1) {
+          V.dolly = false;
+          V.controls.target.copy(V.beauty.tgt);
+          V.controls.enabled = true;
+          V.controls.update();
+        }
+      } else {
+        V.controls.update();
+      }
       V.renderer.render(V.scene, V.camera);
     }
   }

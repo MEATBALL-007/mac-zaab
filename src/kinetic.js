@@ -15,6 +15,13 @@
   var panels = [].slice.call(doc.querySelectorAll('.panel'));
   var mode = 'scroll';                // 'scroll' | 'slide'
   var current = 0;                    // active slide index
+  var cinema = !body.classList.contains('no-cinema');  // film treatment ON by default
+  var lastNav = 0;                    // for whip-pan rapid-nav detection
+
+  // tiny event bus so the sound engine / 3D layer can react
+  function emit(name, detail) {
+    try { doc.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (e) {}
+  }
 
   /* ---------- 1. Split words into animatable spans ---------- */
   function splitWords(el) {
@@ -62,7 +69,7 @@
       var e = 1 - Math.pow(1 - p, 3);            // easeOutCubic
       el.textContent = pre + fmt(target * e, sep, dec) + suf;
       if (p < 1) requestAnimationFrame(step);
-      else el.textContent = pre + fmt(target, sep, dec) + suf;
+      else { el.textContent = pre + fmt(target, sep, dec) + suf; emit('mz:countdone', { el: el }); }
     }
     requestAnimationFrame(step);
   }
@@ -74,6 +81,7 @@
     });
     [].forEach.call(scope.querySelectorAll('[data-count]'), countUp);
     if (window.MZ3D && window.MZ3D.onPanelShown) window.MZ3D.onPanelShown(scope);
+    emit('mz:reveal', { panel: scope });
   }
 
   // Replay reveals + count-ups from scratch (used when landing on a slide)
@@ -124,6 +132,7 @@
     var sc = h.scrollTop || body.scrollTop;
     var max = (h.scrollHeight - h.clientHeight) || 1;
     if (progressBar) progressBar.style.width = (sc / max * 100) + '%';
+    if (mode === 'scroll' && cinema) applyGrade(panels[nearestPanel()]);
     if (!reduceMotion && mode === 'scroll') {
       var vh = window.innerHeight;
       plx.forEach(function (el) {
@@ -148,6 +157,28 @@
   var prevBtn = doc.getElementById('prevSlide');
   var nextBtn = doc.getElementById('nextSlide');
   var dotsWrap = doc.querySelector('.dots');
+  var chapterEl = doc.querySelector('.chapter');
+  var chapterNo = doc.querySelector('.chapter__no');
+  var chapterT = doc.querySelector('.chapter__t');
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  // Set body's color-grade (per-act) + (in slide mode) the chapter title card
+  function applyGrade(panel) {
+    if (!panel) return;
+    var g = panel.getAttribute('data-grade');
+    if (g) body.setAttribute('data-grade', g);
+  }
+  function setChapter(i) {
+    if (!chapterEl) return;
+    var panel = panels[i];
+    var label = (panel && (panel.getAttribute('data-chapter') || panel.getAttribute('aria-label'))) || '';
+    if (chapterNo) chapterNo.textContent = pad2(i + 1);
+    if (chapterT) chapterT.textContent = label;
+    chapterEl.classList.remove('go');
+    void chapterEl.offsetWidth;            // restart the rise animation
+    chapterEl.classList.add('go');
+  }
 
   // build dots
   if (dotsWrap) {
@@ -178,6 +209,15 @@
     var old = current;
     current = target;
 
+    // whip-pan on rapid navigation (cinema only); class cleared shortly after
+    var nowT = Date.now();
+    if (cinema && dir !== 0 && old !== current && nowT - lastNav < 280) {
+      body.classList.add('whip');
+      clearTimeout(setActive._whipTo);
+      setActive._whipTo = setTimeout(function () { body.classList.remove('whip'); }, 460);
+    }
+    lastNav = nowT;
+
     // reset every panel except the one that's about to animate out
     panels.forEach(function (p, k) { if (k !== old || dir === 0) clearAnim(p); });
 
@@ -202,6 +242,10 @@
     if (prevBtn) prevBtn.disabled = current === 0;
     if (nextBtn) nextBtn.disabled = current === panels.length - 1;
     dots.forEach(function (d, k) { d.classList.toggle('on', k === current); });
+
+    applyGrade(ap);
+    setChapter(current);
+    emit('mz:slidechange', { index: current, dir: dir });
 
     replayReveal(ap);
     if (window.MZ3D && window.MZ3D.setActiveModel) window.MZ3D.setActiveModel(ap);
@@ -271,11 +315,29 @@
   if (motionBtn) motionBtn.addEventListener('click', function () { setMotion(reduceMotion); });
   applyMotion();   // sync initial state (motion on)
 
+  /* ---------- 7c. Cinema toggle (film treatment) ---------- */
+  var cinemaBtn = doc.getElementById('cinemaToggle');
+  function applyCinema() {
+    body.classList.toggle('cinema', cinema);
+    if (cinemaBtn) {
+      cinemaBtn.setAttribute('aria-pressed', String(cinema));
+      var lbl = cinemaBtn.querySelector('.lbl');
+      if (lbl) lbl.textContent = cinema ? 'Cinema: On' : 'Cinema: Off';
+    }
+    if (cinema) applyGrade(panels[mode === 'slide' ? current : nearestPanel()]);
+    else body.removeAttribute('data-grade');
+    emit('mz:cinema', { on: cinema });
+  }
+  function setCinema(on) { cinema = on; applyCinema(); }
+  if (cinemaBtn) cinemaBtn.addEventListener('click', function () { setCinema(!cinema); });
+  applyCinema();   // sync initial state (cinema on)
+
   /* ---------- 8. Keyboard ---------- */
   doc.addEventListener('keydown', function (e) {
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     if (e.key === 'm' || e.key === 'M') { toggleMode(); return; }
     if (e.key === 'a' || e.key === 'A') { setMotion(reduceMotion); return; }
+    if (e.key === 'c' || e.key === 'C') { setCinema(!cinema); return; }
     if (mode === 'slide') {
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
