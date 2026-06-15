@@ -638,6 +638,24 @@ body:not(.reduce-motion) .brandmark .arches{animation:archBob 4.6s ease-in-out i
 }
 
 /* ============================================================
+   Touchscreen / TV hardening — every keyboard action also has an
+   on-screen control (Mode/Motion/Cinema/Sound in the tool window,
+   prev/next on the nav bars, dots). Drags use Pointer Events so
+   they work with touch. These rules give fast taps, no long-press
+   callout / tap-flash, and bigger touch targets.
+   ============================================================ */
+button{touch-action:manipulation}
+.btn,.ctrl-btn,.nav-btn,.dots button,.toolwin__min,.spin-btn,.brandmark,
+.toolwin__bar,.slidenav,.slidenav .count{
+  -webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;
+}
+/* bigger, easier dot targets on a touch TV */
+.dots{gap:13px}
+.dots button{width:16px;height:16px;border-width:2px}
+/* keep the side nav bars comfortably tappable */
+.nav-btn{width:46px;height:46px;font-size:20px}
+
+/* ============================================================
    "BACKROOMS" prank scene (liminal / A24 vibe) — armed via a
    secret key, fires at the end of the deck, then returns. Pure
    CSS + inline-SVG grain, so the offline file:// build still works.
@@ -7047,7 +7065,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   var armed = true, firing = false, fired = false, curIdx = 0;
   var timer = null, overlay = null;
   var DELAY = 5000;     // time on the last slide before it fires
-  var DURATION = 2600;  // how long the scene stays before returning
+  var DURATION = 2600;  // how long the end scene stays before returning
+  var INTRO = 3000;     // opening "cold open" length on page load
 
   function reduced() { return body.classList.contains('reduce-motion'); }
 
@@ -7137,15 +7156,18 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   }
   function cancel() { clearTimeout(timer); timer = null; }
 
-  function fire() {
-    if (firing || fired || !armed || !onLast()) return;
-    firing = true; fired = true;             // one-shot per page load
+  function runScene(duration, skippable) {
+    if (firing) return;
+    firing = true;
     buildOverlay();
     body.classList.add('backrooms-on');
     startHum();
-    setTimeout(end, DURATION);
+    var to = setTimeout(endScene, duration);
+    if (skippable && overlay) {
+      overlay.addEventListener('pointerdown', function () { clearTimeout(to); endScene(); }, { once: true });
+    }
   }
-  function end() {
+  function endScene() {
     stopHum();
     if (overlay) overlay.classList.add('br--out');
     setTimeout(function () {
@@ -7153,6 +7175,12 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       body.classList.remove('backrooms-on');
       firing = false;
     }, 650);
+  }
+
+  function fire() {
+    if (firing || fired || !armed || !onLast()) return;
+    fired = true;                            // one-shot per page load
+    runScene(DURATION, false);
   }
 
   /* ---------- secret arm / disarm: type "boo" ---------- */
@@ -7179,6 +7207,11 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   doc.addEventListener('mz:reveal', function (e) {
     if (e.detail && e.detail.panel === lastPanel) schedule(); else cancel();
   });
+
+  /* ---------- opening cold-open: flash the backrooms on load ---------- */
+  function intro() { runScene(INTRO, true); }    // tap/click to skip (also unlocks audio)
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', intro);
+  else intro();
 })();
 
 </script>

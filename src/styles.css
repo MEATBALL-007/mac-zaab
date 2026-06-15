@@ -631,6 +631,24 @@ body:not(.reduce-motion) .brandmark .arches{animation:archBob 4.6s ease-in-out i
 }
 
 /* ============================================================
+   Touchscreen / TV hardening — every keyboard action also has an
+   on-screen control (Mode/Motion/Cinema/Sound in the tool window,
+   prev/next on the nav bars, dots). Drags use Pointer Events so
+   they work with touch. These rules give fast taps, no long-press
+   callout / tap-flash, and bigger touch targets.
+   ============================================================ */
+button{touch-action:manipulation}
+.btn,.ctrl-btn,.nav-btn,.dots button,.toolwin__min,.spin-btn,.brandmark,
+.toolwin__bar,.slidenav,.slidenav .count{
+  -webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;
+}
+/* bigger, easier dot targets on a touch TV */
+.dots{gap:13px}
+.dots button{width:16px;height:16px;border-width:2px}
+/* keep the side nav bars comfortably tappable */
+.nav-btn{width:46px;height:46px;font-size:20px}
+
+/* ============================================================
    "BACKROOMS" prank scene (liminal / A24 vibe) — armed via a
    secret key, fires at the end of the deck, then returns. Pure
    CSS + inline-SVG grain, so the offline file:// build still works.
