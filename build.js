@@ -27,6 +27,7 @@ const css = read(path.join(SRC, 'styles.css'))
 const kineticJS = read(path.join(SRC, 'kinetic.js'));
 const mvInitJS = read(path.join(SRC, 'mv-init.js'));
 const threeViewerJS = read(path.join(SRC, 'three-viewer.js'));
+const soundJS = read(path.join(SRC, 'sound.js'));
 
 const THREE_LIB = read(path.join(ASSETS, 'three.min.js'));
 const GLTF_LIB = read(path.join(ASSETS, 'GLTFLoader.js'));
@@ -157,6 +158,13 @@ function heroPanel() {
   return `<section class="panel panel--ink panel--center" aria-label="Title">
     <span class="panel__index">01</span>
     <div class="wrap">
+      <div class="brandmark reveal-pop" id="brandmark" tabindex="0" role="img"
+           aria-label="McDonald's Golden Arches — shown for educational case-study purposes. Click or tap to flip.">
+        <svg class="arches" viewBox="0 0 240 190" aria-hidden="true" focusable="false">
+          <path d="M35 175 L35 75 C35 15 95 15 120 70 C145 15 205 15 205 75 L205 175 L160 175 C160 120 120 120 120 95 C120 120 80 120 80 175 Z"/>
+        </svg>
+      </div>
+      <p class="brandmark__note reveal">McDonald’s Golden Arches · used for education — not for sale</p>
       <p class="eyebrow reveal">McDonald’s · Thailand</p>
       <h1 class="display d-xl kinetic">Marketing Strategy &amp; SWOT</h1>
       <p class="lead reveal" style="--i:1">A real-world case study, a localized hero product, and a full Thai-market launch plan — built around <b>MAC ZAAB</b>.</p>
@@ -362,6 +370,23 @@ function buildHTML(build) {
     ? `\n  <script type="module" src="${MV_CDN}"></script>`
     : '';
 
+  // Per-act cinematic metadata: chapter card label + color grade.
+  // Research/problem acts run cool; the hero, products and payoff run warm/hot.
+  const meta = [
+    { ch: 'Title', grade: 'hot' },
+    { ch: 'Company Snapshot', grade: 'cool' },
+    { ch: 'SWOT Analysis', grade: 'cool' },
+    { ch: 'Glocalization', grade: 'cool' },
+    { ch: 'Thai Insights', grade: 'cool' },
+    { ch: 'MAC ZAAB', grade: 'hot' },
+    { ch: 'Tom Yum Goong Burger', grade: 'warm' },
+    { ch: 'Som Tam Shaker Fries', grade: 'warm' },
+    { ch: 'Mango Sticky Rice McFlurry', grade: 'warm' },
+    { ch: 'Thai Iced Green Milk Tea', grade: 'warm' },
+    { ch: 'Pricing', grade: 'warm' },
+    { ch: 'Marketing Plan', grade: 'warm' },
+    { ch: 'Key Takeaways', grade: 'hot' }
+  ];
   const panels = [
     heroPanel(),
     snapshotPanel(),
@@ -376,12 +401,17 @@ function buildHTML(build) {
     pricingPanel(),
     planPanel(),
     closingPanel()
-  ].join('\n');
+  ]
+    .map((html, i) => html.replace('<section class="panel',
+      `<section data-chapter="${meta[i].ch}" data-grade="${meta[i].grade}" class="panel`))
+    // give the giant index numbers some parallax depth (multi-plane scroll)
+    .map((html) => html.replace(/class="panel__index"/g, 'class="panel__index" data-parallax="0.1"'))
+    .join('\n');
 
   let scripts;
   if (build === 'cdn') {
     scripts =
-      `<script>\n${kineticJS}\n</script>\n<script>\n${mvInitJS}\n</script>`;
+      `<script>\n${kineticJS}\n</script>\n<script>\n${mvInitJS}\n</script>\n<script>\n${soundJS}\n</script>`;
   } else {
     const modelsObj = PRODUCTS.map((p) => `"${p.key}":"${b64(path.join(MODELS, p.file))}"`).join(',\n');
     scripts =
@@ -391,7 +421,8 @@ function buildHTML(build) {
       `<script>\n${ROOM_LIB}\n</script>\n` +
       `<script>window.MZ_MODELS={\n${modelsObj}\n};</script>\n` +
       `<script>\n${threeViewerJS}\n</script>\n` +
-      `<script>\n${kineticJS}\n</script>`;
+      `<script>\n${kineticJS}\n</script>\n` +
+      `<script>\n${soundJS}\n</script>`;
   }
 
   return `<!doctype html>
@@ -403,12 +434,30 @@ function buildHTML(build) {
   <meta name="description" content="MAC ZAAB — a McDonald’s Thailand marketing case study: SWOT, glocalization research, Thai consumer insights, a localized hero product line with interactive 3D models, pricing and a go-to-market plan.">
   <style>\n${css}\n</style>${headExtra}
 </head>
-<body>
+<body class="cinema">
   <div class="progress" aria-hidden="true"><div class="progress__bar"></div></div>
+
+  <!-- Cinematic overlays (film grain, vignette, color grade, letterbox, chapter card) -->
+  <div class="cine" aria-hidden="true">
+    <div class="cine__grade"></div>
+    <div class="cine__vig"></div>
+    <div class="cine__grain"></div>
+    <div class="cine__bar cine__bar--t"></div>
+    <div class="cine__bar cine__bar--b"></div>
+  </div>
+  <div class="chapter" aria-hidden="true">
+    <span class="chapter__no"></span><span class="chapter__clip"><span class="chapter__t"></span></span>
+  </div>
 
   <div class="controls">
     <button id="motionToggle" class="ctrl-btn ctrl-btn--motion" aria-pressed="true" title="Toggle animations (A)">
       <span class="ico" aria-hidden="true">✦</span><span class="lbl">Motion: On</span>
+    </button>
+    <button id="cinemaToggle" class="ctrl-btn ctrl-btn--cinema" aria-pressed="true" title="Toggle cinematic film treatment (C)">
+      <span class="ico" aria-hidden="true">🎬</span><span class="lbl">Cinema: On</span>
+    </button>
+    <button id="soundToggle" class="ctrl-btn ctrl-btn--sound" aria-pressed="false" title="Toggle sound design (S)">
+      <span class="ico" aria-hidden="true">♪</span><span class="lbl">Sound: Off</span>
     </button>
     <button id="modeToggle" class="ctrl-btn" aria-pressed="false" title="Toggle Scroll / Slide mode (M)">
       <span class="ico" aria-hidden="true">▦</span><span class="lbl">Slide mode</span>

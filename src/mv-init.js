@@ -42,13 +42,30 @@
   applyMotion(reduced());
   document.addEventListener('mz:motion', function (e) { applyMotion(e.detail.reduced); });
 
-  // Entrance: model-viewer reveals itself; we just toggle the .ready loader off
+  // Entrance: model-viewer reveals itself; we just toggle the .ready loader off,
+  // then dolly (push the camera in from a wider radius) for a cinematic reveal.
   [].forEach.call(document.querySelectorAll('model-viewer'), function (mv) {
     mv.addEventListener('load', function () {
       var stage = mv.closest('.stage-frame');
       if (stage) stage.classList.add('mv-loaded');
+      if (reduced()) return;
+      try {
+        var o = mv.getCameraOrbit();
+        var phi = toDeg(o.phi), theta = toDeg(o.theta);
+        mv.cameraOrbit = theta + 'deg ' + phi + 'deg 155%';
+        setTimeout(function () { mv.cameraOrbit = theta + 'deg ' + phi + 'deg auto'; }, 60);
+      } catch (e) {}
     });
   });
+
+  // Cinema toggle: lift exposure for a richer, filmic look
+  function applyCinema(on) {
+    [].forEach.call(document.querySelectorAll('model-viewer'), function (mv) {
+      mv.setAttribute('exposure', on ? '1.3' : '1.1');
+    });
+  }
+  applyCinema(document.body.classList.contains('cinema'));
+  document.addEventListener('mz:cinema', function (e) { applyCinema(e.detail && e.detail.on); });
 
   // No-op hooks so kinetic.js can call them uniformly
   window.MZ3D = {
