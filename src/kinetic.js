@@ -152,10 +152,10 @@
   var progressBar = doc.querySelector('.progress__bar');
   var toggleBtn = doc.getElementById('modeToggle');
   var motionBtn = doc.getElementById('motionToggle');
-  var slidenav = doc.querySelector('.slidenav');
-  var counter = doc.querySelector('.slidenav .count');
-  var prevBtn = doc.getElementById('prevSlide');
-  var nextBtn = doc.getElementById('nextSlide');
+  var slidenavs = [].slice.call(doc.querySelectorAll('.slidenav'));
+  var counters = [].slice.call(doc.querySelectorAll('.slidenav .count'));
+  var prevBtns = [].slice.call(doc.querySelectorAll('.slidenav .nav-prev'));
+  var nextBtns = [].slice.call(doc.querySelectorAll('.slidenav .nav-next'));
   var dotsWrap = doc.querySelector('.dots');
   var chapterEl = doc.querySelector('.chapter');
   var chapterNo = doc.querySelector('.chapter__no');
@@ -238,9 +238,10 @@
     ap.classList.add('is-active', dir > 0 ? 'from-next' : (dir < 0 ? 'from-prev' : 'from-init'));
     ap.scrollTop = 0;
 
-    if (counter) counter.textContent = (current + 1) + ' / ' + panels.length;
-    if (prevBtn) prevBtn.disabled = current === 0;
-    if (nextBtn) nextBtn.disabled = current === panels.length - 1;
+    var navLabel = (current + 1) + ' / ' + panels.length;
+    counters.forEach(function (c) { c.textContent = navLabel; });
+    prevBtns.forEach(function (b) { b.disabled = current === 0; });
+    nextBtns.forEach(function (b) { b.disabled = current === panels.length - 1; });
     dots.forEach(function (d, k) { d.classList.toggle('on', k === current); });
 
     applyGrade(ap);
@@ -264,7 +265,7 @@
       toggleBtn.querySelector('.lbl').textContent = 'Scroll mode';
       toggleBtn.querySelector('.ico').textContent = '☰';
     }
-    if (slidenav) slidenav.setAttribute('aria-hidden', 'false');
+    slidenavs.forEach(function (n) { n.setAttribute('aria-hidden', 'false'); });
     setActive(start);
   }
   function enterScroll() {
@@ -276,7 +277,7 @@
       toggleBtn.querySelector('.lbl').textContent = 'Slide mode';
       toggleBtn.querySelector('.ico').textContent = '▦';
     }
-    if (slidenav) slidenav.setAttribute('aria-hidden', 'true');
+    slidenavs.forEach(function (n) { n.setAttribute('aria-hidden', 'true'); });
     panels.forEach(clearAnim);
     if (window.MZ3D && window.MZ3D.setActiveModel) window.MZ3D.setActiveModel(null);
     // jump to where we were
@@ -287,8 +288,8 @@
   function toggleMode() { if (mode === 'scroll') enterSlide(); else enterScroll(); }
 
   if (toggleBtn) toggleBtn.addEventListener('click', toggleMode);
-  if (nextBtn) nextBtn.addEventListener('click', next);
-  if (prevBtn) prevBtn.addEventListener('click', prev);
+  nextBtns.forEach(function (b) { b.addEventListener('click', next); });
+  prevBtns.forEach(function (b) { b.addEventListener('click', prev); });
 
   /* ---------- 7b. Motion toggle ---------- */
   function applyMotion() {
@@ -332,40 +333,45 @@
   if (cinemaBtn) cinemaBtn.addEventListener('click', function () { setCinema(!cinema); });
   applyCinema();   // sync initial state (cinema on)
 
-  /* ---------- 7d. Tool window: draggable + collapsible controls ---------- */
+  /* ---------- 7d. Draggable floating UI (tool window + slide bars) ---------- */
+  // Drag `el` by `handle`; switches to px left/top on first drag, clamps to viewport.
+  // `ignore(target)` lets a child (e.g. a button) keep its own click.
+  function makeDraggable(el, handle, ignore) {
+    if (!el || !handle) return;
+    var dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    handle.addEventListener('pointerdown', function (e) {
+      if (ignore && ignore(e.target)) return;
+      var r = el.getBoundingClientRect();
+      el.style.left = r.left + 'px'; el.style.top = r.top + 'px';
+      el.style.right = 'auto'; el.style.bottom = 'auto'; el.style.transform = 'none';
+      dragging = true; sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top;
+      try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+    });
+    handle.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var w = el.offsetWidth, h = el.offsetHeight;
+      var nx = Math.max(4, Math.min(window.innerWidth - w - 4, ox + (e.clientX - sx)));
+      var ny = Math.max(4, Math.min(window.innerHeight - h - 4, oy + (e.clientY - sy)));
+      el.style.left = nx + 'px'; el.style.top = ny + 'px';
+    });
+    function endDrag(e) { if (dragging) { dragging = false; try { handle.releasePointerCapture(e.pointerId); } catch (err) {} } }
+    handle.addEventListener('pointerup', endDrag);
+    handle.addEventListener('pointercancel', endDrag);
+  }
+
   var toolwin = doc.getElementById('toolwin');
   var toolBar = doc.getElementById('toolwinBar');
   var toolMin = doc.getElementById('toolwinMin');
-  if (toolwin && toolBar) {
-    var dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
-    toolBar.addEventListener('pointerdown', function (e) {
-      if (e.target === toolMin) return;          // let the collapse button click through
-      var r = toolwin.getBoundingClientRect();
-      // switch to top/left positioning so we can move it freely
-      toolwin.style.left = r.left + 'px';
-      toolwin.style.top = r.top + 'px';
-      toolwin.style.right = 'auto';
-      toolwin.style.bottom = 'auto';
-      dragging = true; sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top;
-      try { toolBar.setPointerCapture(e.pointerId); } catch (err) {}
-    });
-    toolBar.addEventListener('pointermove', function (e) {
-      if (!dragging) return;
-      var w = toolwin.offsetWidth, h = toolwin.offsetHeight;
-      var nx = Math.max(4, Math.min(window.innerWidth - w - 4, ox + (e.clientX - sx)));
-      var ny = Math.max(4, Math.min(window.innerHeight - h - 4, oy + (e.clientY - sy)));
-      toolwin.style.left = nx + 'px';
-      toolwin.style.top = ny + 'px';
-    });
-    function endDrag(e) { if (dragging) { dragging = false; try { toolBar.releasePointerCapture(e.pointerId); } catch (err) {} } }
-    toolBar.addEventListener('pointerup', endDrag);
-    toolBar.addEventListener('pointercancel', endDrag);
-    if (toolMin) toolMin.addEventListener('click', function () {
-      var collapsed = toolwin.classList.toggle('collapsed');
-      toolMin.textContent = collapsed ? '+' : '–';
-      toolMin.setAttribute('aria-label', collapsed ? 'Show controls' : 'Hide controls');
-    });
-  }
+  makeDraggable(toolwin, toolBar, function (t) { return t === toolMin; });
+  if (toolMin) toolMin.addEventListener('click', function () {
+    var collapsed = toolwin.classList.toggle('collapsed');
+    toolMin.textContent = collapsed ? '+' : '–';
+    toolMin.setAttribute('aria-label', collapsed ? 'Show controls' : 'Hide controls');
+  });
+
+  // each slide bar is draggable by its counter (the number in the middle)
+  slidenavs.forEach(function (n) { makeDraggable(n, n.querySelector('.count')); });
 
   /* ---------- 8. Keyboard ---------- */
   doc.addEventListener('keydown', function (e) {

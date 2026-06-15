@@ -350,14 +350,21 @@ a{color:inherit}
 .progress{position:fixed;top:0;left:0;height:4px;width:100%;z-index:65;background:transparent}
 .progress__bar{height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--yellow));transition:width .1s linear}
 
-/* Slide-mode nav */
+/* Slide-mode nav — two draggable bars (left & right presenter) */
 .slidenav{
-  position:fixed;z-index:60;left:50%;bottom:18px;transform:translateX(-50%);
-  display:none;align-items:center;gap:14px;
+  position:fixed;z-index:61;
+  display:none;align-items:center;gap:12px;
   background:var(--ink);color:var(--paper);
-  padding:8px 10px 8px 16px;border-radius:999px;box-shadow:var(--shadow);
+  padding:8px 12px;border-radius:999px;box-shadow:var(--shadow);
+  touch-action:none;
 }
-.slidenav .count{font-family:var(--disp);font-size:18px;letter-spacing:.04em;min-width:74px;text-align:center}
+.slidenav--left{left:16px;top:50%;transform:translateY(-50%)}
+.slidenav--right{right:16px;top:50%;transform:translateY(-50%)}
+.slidenav .count{
+  font-family:var(--disp);font-size:18px;letter-spacing:.04em;min-width:74px;text-align:center;
+  cursor:grab;user-select:none;touch-action:none;
+}
+.slidenav .count:active{cursor:grabbing}
 .nav-btn{
   width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
   background:var(--paper);color:var(--ink);border:0;font-size:18px;font-weight:900;
@@ -366,10 +373,10 @@ a{color:inherit}
 .nav-btn:hover{transform:scale(1.08);background:var(--yellow)}
 .nav-btn:disabled{opacity:.35;cursor:default;transform:none}
 
-/* slide dots */
+/* slide dots — bottom-centre (out of the way of the two side nav bars) */
 .dots{
-  position:fixed;z-index:60;right:18px;top:50%;transform:translateY(-50%);
-  display:none;flex-direction:column;gap:9px;
+  position:fixed;z-index:60;left:50%;bottom:14px;transform:translateX(-50%);
+  display:none;flex-direction:row;gap:9px;
 }
 .dots button{
   width:11px;height:11px;border-radius:50%;border:2px solid var(--ink);
@@ -602,6 +609,26 @@ body.reduce-motion .stage-frame{animation:none !important}
 .brandmark__note{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.5;margin:0 0 22px}
 body:not(.reduce-motion) .brandmark .arches{animation:archBob 4.6s ease-in-out infinite}
 @keyframes archBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+/* ============================================================
+   Keep the cover (Title) slide within a single screen — the logo
+   + disclaimer pushed it past one viewport; these scoped rules
+   shrink it to fit (and trim decorations on short displays).
+   ============================================================ */
+.panel[data-chapter="Title"]{padding-top:clamp(40px,7vh,92px);padding-bottom:clamp(40px,7vh,92px)}
+.panel[data-chapter="Title"] .brandmark{width:clamp(58px,8vw,112px);margin:0 0 6px}
+.panel[data-chapter="Title"] .brandmark__note{margin:0 0 12px}
+.panel[data-chapter="Title"] .eyebrow{margin-bottom:10px}
+.panel[data-chapter="Title"] .d-xl{font-size:clamp(34px,7vw,108px)}
+.panel[data-chapter="Title"] .lead{font-size:clamp(15px,1.5vw,21px)}
+.panel[data-chapter="Title"] .marquee{margin:clamp(14px,2.4vw,30px) 0}
+.panel[data-chapter="Title"] .teaser{min-height:clamp(120px,18vw,220px);margin-top:clamp(16px,2.6vw,40px)}
+@media (max-height:720px){
+  .panel[data-chapter="Title"] .teaser{min-height:0}
+  .panel[data-chapter="Title"] .teaser .tcard{aspect-ratio:auto;height:clamp(78px,15vh,134px)}
+  .panel[data-chapter="Title"] .marquee{margin:10px 0}
+  .panel[data-chapter="Title"] .teaser ~ p{display:none}   /* drop the "press M" tip */
+}
 
 /* ============================================================
    "BACKROOMS" prank scene (liminal / A24 vibe) — armed via a
