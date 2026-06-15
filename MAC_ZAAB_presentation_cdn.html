@@ -461,137 +461,6 @@ body.reduce-motion .kinetic .word>span{transform:none}
 body.reduce-motion .reveal,body.reduce-motion .reveal-l,body.reduce-motion .reveal-pop{opacity:1;transform:none}
 body.reduce-motion .marquee__track{animation:none;transform:none}
 
-/* ============================================================
-   CINEMA MODE — film overlays, color grade, rack focus,
-   bloom, letterbox, chapter titling, title sequence.
-   All gated behind body.cinema (toggle, default ON). Pure CSS,
-   no external assets (grain is an inline SVG data URI), so the
-   offline file:// build stays self-contained.
-   ============================================================ */
-
-/* Overlay host — never intercepts pointer events */
-.cine{position:fixed;inset:0;z-index:40;pointer-events:none}
-.cine>*{pointer-events:none}
-
-/* --- 10. Per-act color grade (cool research -> warm/hot product) --- */
-.cine__grade{
-  position:fixed;inset:0;z-index:40;opacity:0;mix-blend-mode:soft-light;
-  background:transparent;
-  transition:background 1.2s var(--ease),opacity 1.2s var(--ease);
-}
-body.cinema .cine__grade{opacity:.55}
-body.cinema[data-grade="cool"] .cine__grade{background:linear-gradient(180deg,#1d4470,#0a1a33)}
-body.cinema[data-grade="warm"] .cine__grade{background:linear-gradient(180deg,#6a3b12,#2a1606)}
-body.cinema[data-grade="hot"]  .cine__grade{background:radial-gradient(120% 100% at 50% 28%,#8a3300,#260c00)}
-
-/* --- 5. Vignette --- */
-.cine__vig{
-  position:fixed;inset:0;z-index:45;opacity:0;mix-blend-mode:multiply;
-  background:radial-gradient(125% 100% at 50% 48%,transparent 52%,rgba(0,0,0,.34) 100%);
-  transition:opacity 1s var(--ease);
-}
-body.cinema .cine__vig{opacity:1}
-
-/* --- 5. Film grain (animated inline-SVG noise) --- */
-.cine__grain{
-  position:fixed;inset:-60%;z-index:55;opacity:0;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:200px 200px;
-}
-body.cinema .cine__grain{opacity:.06}
-body.cinema:not(.reduce-motion) .cine__grain{animation:cineGrain 1.6s steps(5) infinite}
-@keyframes cineGrain{
-  0%{transform:translate3d(0,0,0)}      20%{transform:translate3d(-3%,2%,0)}
-  40%{transform:translate3d(2%,-3%,0)}  60%{transform:translate3d(-2%,1%,0)}
-  80%{transform:translate3d(3%,2%,0)}   100%{transform:translate3d(0,0,0)}
-}
-
-/* --- 1. Letterbox bars (slide mode only) --- */
-.cine__bar{position:fixed;left:0;right:0;height:0;background:#000;z-index:58;transition:height .6s var(--ease)}
-.cine__bar--t{top:0}
-.cine__bar--b{bottom:0}
-body.cinema.mode-slide .cine__bar{height:clamp(20px,5.5vh,62px)}
-
-/* --- 1. Chapter title card (sits inside the bottom bar, slide mode) --- */
-.chapter{
-  position:fixed;left:var(--pad);bottom:0;z-index:59;
-  height:clamp(20px,5.5vh,62px);display:flex;align-items:center;gap:12px;
-  opacity:0;transition:opacity .5s var(--ease);
-}
-body.cinema.mode-slide .chapter{opacity:1}
-.chapter__no{font-family:var(--disp);font-size:clamp(14px,2.2vw,26px);line-height:1;color:var(--yellow);letter-spacing:.02em}
-.chapter__clip{overflow:hidden;display:inline-block}
-.chapter__t{
-  display:inline-block;font-family:var(--disp);text-transform:uppercase;
-  font-size:clamp(12px,1.5vw,20px);letter-spacing:.04em;color:#fff;line-height:1.1;
-}
-.chapter.go .chapter__t{animation:chapRise .6s var(--ease) both}
-@keyframes chapRise{from{opacity:0;transform:translateY(115%)}to{opacity:1;transform:none}}
-
-/* --- 3. Rack focus: stage blurs in, snaps sharp on reveal --- */
-body.cinema .stage-frame{transition:filter 1.1s var(--ease),transform 30s ease-in-out}
-body.cinema .product__stage:not(.in) .stage-frame{filter:blur(20px) saturate(.6) brightness(1.06)}
-body.cinema .product__stage.in .stage-frame{filter:blur(0) saturate(1)}
-
-/* --- 5. Bloom-style screen-blend glow over the product --- */
-body.cinema .stage-frame::before{
-  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  mix-blend-mode:screen;opacity:0;transition:opacity 1.2s var(--ease);
-  background:radial-gradient(58% 50% at 50% 38%,rgba(255,243,205,.22),transparent 70%);
-}
-body.cinema .product__stage.in .stage-frame::before{opacity:1}
-body.cinema:not(.reduce-motion) .product__stage.in .stage-frame::before{animation:bloomPulse 5.5s var(--ease) infinite}
-@keyframes bloomPulse{0%,100%{opacity:.5}50%{opacity:.95}}
-
-/* --- 7. Ken Burns: slow drift on the product stages --- */
-body.cinema:not(.reduce-motion) .product__stage.in .stage-frame{animation:kenburns 30s ease-in-out infinite alternate}
-@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.035)}}
-
-/* --- 9. Title sequence: overshoot + glow on the marquee titles --- */
-body.cinema .panel[data-chapter="Title"] .display.kinetic.in .word>span,
-body.cinema .panel[data-chapter="MAC ZAAB"] .display.kinetic.in .word>span{
-  animation:titleIn .95s var(--ease) both;
-  animation-delay:calc(var(--i,0)*70ms);
-}
-@keyframes titleIn{
-  0%{opacity:0;transform:translateY(118%) rotate(7deg)}
-  62%{opacity:1;transform:translateY(-7%) rotate(-1.4deg)}
-  100%{transform:translateY(0) rotate(0)}
-}
-body.cinema .panel[data-chapter="Title"] .d-xl.in,
-body.cinema .panel[data-chapter="MAC ZAAB"] .d-xl.in{animation:titleGlow 2.6s var(--ease) .25s both}
-@keyframes titleGlow{
-  0%{text-shadow:0 0 30px rgba(255,199,44,0)}
-  42%{text-shadow:0 0 44px rgba(255,199,44,.55)}
-  100%{text-shadow:0 0 0 rgba(255,199,44,0)}
-}
-
-/* --- 6. Cinematic slide transitions: add blur to the push --- */
-body.cinema.mode-slide .panel.from-next{animation:slEnterNextC .66s var(--ease) both}
-body.cinema.mode-slide .panel.from-prev{animation:slEnterPrevC .66s var(--ease) both}
-body.cinema.mode-slide .panel.from-init{animation:slEnterInitC .6s var(--ease) both}
-body.cinema.mode-slide .panel.leave-next{animation:slLeaveNextC .52s var(--ease-out) both}
-body.cinema.mode-slide .panel.leave-prev{animation:slLeavePrevC .52s var(--ease-out) both}
-@keyframes slEnterNextC{from{opacity:0;filter:blur(14px);transform:translate3d(9%,3%,0) scale(.92)}to{opacity:1;filter:blur(0);transform:none}}
-@keyframes slEnterPrevC{from{opacity:0;filter:blur(14px);transform:translate3d(-9%,-3%,0) scale(.92)}to{opacity:1;filter:blur(0);transform:none}}
-@keyframes slEnterInitC{from{opacity:0;filter:blur(10px);transform:scale(.96)}to{opacity:1;filter:blur(0);transform:none}}
-@keyframes slLeaveNextC{from{opacity:1;filter:blur(0);transform:none}to{opacity:0;filter:blur(12px);transform:translate3d(-8%,-3%,0) scale(.92)}}
-@keyframes slLeavePrevC{from{opacity:1;filter:blur(0);transform:none}to{opacity:0;filter:blur(12px);transform:translate3d(8%,3%,0) scale(.92)}}
-
-/* --- 6. Whip-pan: stronger blur on rapid navigation --- */
-body.cinema.mode-slide.whip .panel.from-next{animation:whipNext .4s var(--ease-out) both}
-body.cinema.mode-slide.whip .panel.from-prev{animation:whipPrev .4s var(--ease-out) both}
-@keyframes whipNext{0%{opacity:.2;filter:blur(26px);transform:translate3d(30%,0,0)}100%{opacity:1;filter:blur(0);transform:none}}
-@keyframes whipPrev{0%{opacity:.2;filter:blur(26px);transform:translate3d(-30%,0,0)}100%{opacity:1;filter:blur(0);transform:none}}
-
-/* Sound toggle button states (mirrors the motion toggle look) */
-.ctrl-btn--sound[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--yellow)}
-.ctrl-btn--sound[aria-pressed="false"]{background:var(--paper);border-color:var(--ink);color:var(--ink);opacity:.72}
-.ctrl-btn--cinema[aria-pressed="false"]{background:var(--paper);border-color:var(--ink);color:var(--ink);opacity:.72}
-
-/* Keep film overlays from fighting reduced-motion (statics still show) */
-body.reduce-motion .cine__grain{animation:none}
-body.reduce-motion .stage-frame{animation:none !important}
 
 /* ============================================================
    Interactive brand mark — McDonald's Golden Arches
@@ -622,24 +491,24 @@ body:not(.reduce-motion) .brandmark .arches{animation:archBob 4.6s ease-in-out i
    + disclaimer pushed it past one viewport; these scoped rules
    shrink it to fit (and trim decorations on short displays).
    ============================================================ */
-.panel[data-chapter="Title"]{padding-top:clamp(40px,7vh,92px);padding-bottom:clamp(40px,7vh,92px)}
-.panel[data-chapter="Title"] .brandmark{width:clamp(58px,8vw,112px);margin:0 0 6px}
-.panel[data-chapter="Title"] .brandmark__note{margin:0 0 12px}
-.panel[data-chapter="Title"] .eyebrow{margin-bottom:10px}
-.panel[data-chapter="Title"] .d-xl{font-size:clamp(34px,7vw,108px)}
-.panel[data-chapter="Title"] .lead{font-size:clamp(15px,1.5vw,21px)}
-.panel[data-chapter="Title"] .marquee{margin:clamp(14px,2.4vw,30px) 0}
-.panel[data-chapter="Title"] .teaser{min-height:clamp(120px,18vw,220px);margin-top:clamp(16px,2.6vw,40px)}
+.deck>.panel:first-child{padding-top:clamp(40px,7vh,92px);padding-bottom:clamp(40px,7vh,92px)}
+.deck>.panel:first-child .brandmark{width:clamp(58px,8vw,112px);margin:0 0 6px}
+.deck>.panel:first-child .brandmark__note{margin:0 0 12px}
+.deck>.panel:first-child .eyebrow{margin-bottom:10px}
+.deck>.panel:first-child .d-xl{font-size:clamp(34px,7vw,108px)}
+.deck>.panel:first-child .lead{font-size:clamp(15px,1.5vw,21px)}
+.deck>.panel:first-child .marquee{margin:clamp(14px,2.4vw,30px) 0}
+.deck>.panel:first-child .teaser{min-height:clamp(120px,18vw,220px);margin-top:clamp(16px,2.6vw,40px)}
 @media (max-height:720px){
-  .panel[data-chapter="Title"] .teaser{min-height:0}
-  .panel[data-chapter="Title"] .teaser .tcard{aspect-ratio:auto;height:clamp(78px,15vh,134px)}
-  .panel[data-chapter="Title"] .marquee{margin:10px 0}
-  .panel[data-chapter="Title"] .teaser ~ p{display:none}   /* drop the "press M" tip */
+  .deck>.panel:first-child .teaser{min-height:0}
+  .deck>.panel:first-child .teaser .tcard{aspect-ratio:auto;height:clamp(78px,15vh,134px)}
+  .deck>.panel:first-child .marquee{margin:10px 0}
+  .deck>.panel:first-child .teaser ~ p{display:none}   /* drop the "press M" tip */
 }
 
 /* ============================================================
    Touchscreen / TV hardening — every keyboard action also has an
-   on-screen control (Mode/Motion/Cinema/Sound in the tool window,
+   on-screen control (Mode/Motion in the tool window,
    prev/next on the nav bars, dots). Drags use Pointer Events so
    they work with touch. These rules give fast taps, no long-press
    callout / tap-flash, and bigger touch targets.
@@ -655,104 +524,11 @@ button{touch-action:manipulation}
 /* keep the side nav bars comfortably tappable */
 .nav-btn{width:46px;height:46px;font-size:20px}
 
-/* ============================================================
-   "BACKROOMS" prank scene (liminal / A24 vibe) — armed via a
-   secret key, fires at the end of the deck, then returns. Pure
-   CSS + inline-SVG grain, so the offline file:// build still works.
-   No faces, no text — atmosphere + flicker + VHS only.
-   ============================================================ */
-body.backrooms-on{cursor:none}
-.br{
-  position:fixed;inset:0;z-index:99999;overflow:hidden;background:#9c8d33;
-  filter:saturate(1.18) contrast(1.07);
-  animation:brIn .22s ease both;
-}
-.br.br--out{opacity:0;transition:opacity .6s ease}
-@keyframes brIn{from{opacity:0}to{opacity:1}}
-
-/* camera sway (found-footage handheld) + fast shake (separate layers) */
-.br__cam{position:absolute;inset:-5%}
-.br__shake{position:absolute;inset:0}
-body:not(.reduce-motion) .br__cam{animation:brSway 7s ease-in-out infinite}
-body:not(.reduce-motion) .br__shake{animation:brShake .2s steps(2,end) infinite}
-@keyframes brSway{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(1.1%,-.8%) rotate(.3deg)}50%{transform:translate(-.8%,1%) rotate(-.2deg)}75%{transform:translate(.6%,.4%) rotate(.15deg)}}
-@keyframes brShake{0%{transform:translate(0,0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-3px)}80%{transform:translate(2px,3px)}100%{transform:translate(0,0)}}
-
-/* one-point-perspective corridor built from clip-path trapezoids */
-.br__scene{position:absolute;inset:0;background:#b3a23a}
-.br__scene>div{position:absolute;inset:0}
-.br__ceiling{background:linear-gradient(#cfc169,#a99a3c);clip-path:polygon(0 0,100% 0,68% 33%,32% 33%)}
-.br__floor{background:linear-gradient(#7d7128,#9a8c34);clip-path:polygon(0 100%,100% 100%,68% 67%,32% 67%)}
-.br__wall-l{background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 7px,transparent 7px 16px),linear-gradient(90deg,#8a7c2e,#5f5520);clip-path:polygon(0 0,32% 33%,32% 67%,0 100%)}
-.br__wall-r{background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 7px,transparent 7px 16px),linear-gradient(270deg,#8a7c2e,#5f5520);clip-path:polygon(100% 0,68% 33%,68% 67%,100% 100%)}
-.br__back{position:absolute;left:32%;top:33%;width:36%;height:34%;
-  background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 8px,transparent 8px 18px),linear-gradient(#9c8d33,#7d7026);
-  box-shadow:inset 0 0 60px rgba(0,0,0,.45)}
-
-/* receding fluorescent ceiling panels (flicker) */
-.br__light{position:absolute;left:50%;transform:translateX(-50%);background:#fbf4c0;border-radius:2px;
-  box-shadow:0 0 26px 7px rgba(255,246,190,.75)}
-.br__light.l1{top:6%;width:16%;height:2.4%}
-.br__light.l2{top:14%;width:11%;height:1.9%}
-.br__light.l3{top:21%;width:7.5%;height:1.4%}
-.br__light.l4{top:27%;width:4.5%;height:1%}
-body:not(.reduce-motion) .br__light{animation:brFlick 3.1s steps(1) infinite}
-.br__light.l2{animation-delay:.6s}
-.br__light.l3{animation-delay:1.3s}
-.br__light.l4{animation-delay:.9s}
-@keyframes brFlick{0%,100%{opacity:1}7%{opacity:.35}9%{opacity:1}54%{opacity:1}56%{opacity:.18}58%{opacity:.9}81%{opacity:1}83%{opacity:.5}85%{opacity:1}}
-
-/* VHS / TV overlays (steady, not shaken) */
-.br__grain{position:absolute;inset:-50%;opacity:.13;mix-blend-mode:overlay;background-size:180px 180px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-body:not(.reduce-motion) .br__grain{animation:cineGrain 1.2s steps(5) infinite}
-.br__scan{position:absolute;inset:0;mix-blend-mode:multiply;opacity:.5;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
-.br__vig{position:absolute;inset:0;background:radial-gradient(120% 92% at 50% 45%,transparent 44%,rgba(0,0,0,.72) 100%)}
-.br__flicker{position:absolute;inset:0;background:#000;opacity:0}
-body:not(.reduce-motion) .br__flicker{animation:brBlackFlick 5s steps(1) infinite}
-@keyframes brBlackFlick{0%,100%{opacity:0}48%{opacity:0}49%{opacity:.5}50%{opacity:0}77%{opacity:0}78%{opacity:.32}79%{opacity:0}}
-
-/* VHS tracking band sweeping up the frame (90s handcam) */
-.br__track{position:absolute;left:0;right:0;top:110%;height:9%;opacity:.5;mix-blend-mode:screen;filter:blur(1px);
-  background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.22),rgba(255,255,255,0))}
-body:not(.reduce-motion) .br__track{animation:brTrack 6s linear infinite}
-@keyframes brTrack{0%{top:110%}100%{top:-20%}}
-
-/* old camcorder HUD: REC, battery, timestamp (90s handcam UI, no scary text) */
-.br__hud{position:absolute;inset:0;font-family:'Courier New',monospace;color:#f6f6f6;
-  text-shadow:0 0 4px rgba(0,0,0,.85);opacity:.92}
-.br__rec{position:absolute;top:5%;right:6%;display:flex;align-items:center;gap:8px;
-  font-size:clamp(12px,1.6vw,18px);letter-spacing:.14em}
-.br__rec b{width:.7em;height:.7em;border-radius:50%;background:#ff2a2a;display:inline-block;box-shadow:0 0 8px #ff2a2a}
-body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
-@keyframes recBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
-.br__bat{position:absolute;top:5%;left:6%;font-size:clamp(11px,1.4vw,16px);letter-spacing:.1em}
-.br__time{position:absolute;bottom:5%;left:6%;font-size:clamp(12px,1.6vw,18px);letter-spacing:.08em}
-
-/* tiny presenter-only toast confirming armed/disarmed (not shown to the friend) */
-.prank-toast{position:fixed;left:14px;bottom:14px;z-index:100000;pointer-events:none;
-  background:rgba(0,0,0,.82);color:#ffd23c;font-family:var(--body);font-weight:800;
-  font-size:12px;letter-spacing:.08em;padding:8px 13px;border-radius:10px;
-  opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
-.prank-toast.show{opacity:1;transform:none}
-
 </style>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 </head>
-<body class="cinema">
+<body>
   <div class="progress" aria-hidden="true"><div class="progress__bar"></div></div>
-
-  <!-- Cinematic overlays (film grain, vignette, color grade, letterbox, chapter card) -->
-  <div class="cine" aria-hidden="true">
-    <div class="cine__grade"></div>
-    <div class="cine__vig"></div>
-    <div class="cine__grain"></div>
-    <div class="cine__bar cine__bar--t"></div>
-    <div class="cine__bar cine__bar--b"></div>
-  </div>
-  <div class="chapter" aria-hidden="true">
-    <span class="chapter__no"></span><span class="chapter__clip"><span class="chapter__t"></span></span>
-  </div>
 
   <div class="controls" id="toolwin">
     <div class="toolwin__bar" id="toolwinBar">
@@ -763,12 +539,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
     <div class="toolwin__body">
       <button id="motionToggle" class="ctrl-btn ctrl-btn--motion" aria-pressed="true" title="Toggle animations (A)">
         <span class="ico" aria-hidden="true">✦</span><span class="lbl">Motion: On</span>
-      </button>
-      <button id="cinemaToggle" class="ctrl-btn ctrl-btn--cinema" aria-pressed="true" title="Toggle cinematic film treatment (C)">
-        <span class="ico" aria-hidden="true">🎬</span><span class="lbl">Cinema: On</span>
-      </button>
-      <button id="soundToggle" class="ctrl-btn ctrl-btn--sound" aria-pressed="false" title="Toggle sound design (S)">
-        <span class="ico" aria-hidden="true">♪</span><span class="lbl">Sound: Off</span>
       </button>
       <button id="modeToggle" class="ctrl-btn" aria-pressed="false" title="Toggle Scroll / Slide mode (M)">
         <span class="ico" aria-hidden="true">▦</span><span class="lbl">Slide mode</span>
@@ -789,8 +559,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   <div class="dots" aria-hidden="true"></div>
 
   <main class="deck">
-<section data-chapter="Title" data-grade="hot" class="panel panel--ink panel--center" aria-label="Title">
-    <span class="panel__index" data-parallax="0.1">01</span>
+<section class="panel panel--ink panel--center" aria-label="Title">
+    <span class="panel__index">01</span>
     <div class="wrap">
       <div class="brandmark reveal-pop" id="brandmark" tabindex="0" role="img"
            aria-label="McDonald's Golden Arches — shown for educational case-study purposes. Click or tap to flip.">
@@ -817,8 +587,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
         Tip — press <b>M</b> or use the top-right button to switch Scroll ↔ Slide mode</p>
     </div>
   </section>
-<section data-chapter="Company Snapshot" data-grade="cool" class="panel panel--paper" aria-label="Company snapshot">
-    <span class="panel__index" data-parallax="0.1">02</span>
+<section class="panel panel--paper" aria-label="Company snapshot">
+    <span class="panel__index">02</span>
     <div class="wrap">
       <p class="eyebrow reveal">Company snapshot</p>
       <h2 class="display d-lg kinetic">The world’s biggest fast-food brand</h2>
@@ -837,8 +607,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       </div>
     </div>
   </section>
-<section data-chapter="SWOT Analysis" data-grade="cool" class="panel panel--cream" aria-label="SWOT analysis">
-    <span class="panel__index" data-parallax="0.1">03</span>
+<section class="panel panel--cream" aria-label="SWOT analysis">
+    <span class="panel__index">03</span>
     <div class="wrap">
       <p class="eyebrow reveal">SWOT analysis · through a Thai lens</p>
       <h2 class="display d-md kinetic">SWOT Analysis</h2>
@@ -866,8 +636,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       </div>
     </div>
   </section>
-<section data-chapter="Glocalization" data-grade="cool" class="panel panel--yellow" aria-label="Glocalization research">
-    <span class="panel__index" data-parallax="0.1">04</span>
+<section class="panel panel--yellow" aria-label="Glocalization research">
+    <span class="panel__index">04</span>
     <div class="wrap">
       <p class="eyebrow reveal">Glocalization research</p>
       <h2 class="display d-md kinetic">How McDonald’s adapts worldwide</h2>
@@ -878,8 +648,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       </div>
     </div>
   </section>
-<section data-chapter="Thai Insights" data-grade="cool" class="panel panel--red" aria-label="Thai consumer insights">
-    <span class="panel__index" data-parallax="0.1">05</span>
+<section class="panel panel--red" aria-label="Thai consumer insights">
+    <span class="panel__index">05</span>
     <div class="wrap">
       <p class="eyebrow reveal">Thai consumer insights</p>
       <h2 class="display d-md kinetic">What Thailand is craving</h2>
@@ -895,8 +665,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       <p class="reveal" style="--i:1;font-weight:700;opacity:.82;font-size:13px;letter-spacing:.06em">Source: LINE MAN Wongnai 2025 trend report</p>
     </div>
   </section>
-<section data-chapter="MAC ZAAB" data-grade="hot" class="panel panel--ink panel--center" aria-label="MAC ZAAB introduction">
-    <span class="panel__index" data-parallax="0.1">06</span>
+<section class="panel panel--ink panel--center" aria-label="MAC ZAAB introduction">
+    <span class="panel__index">06</span>
     <div class="wrap" style="text-align:center">
       <p class="eyebrow reveal" style="color:var(--yellow)">The Hero Product</p>
       <h2 class="display d-xl kinetic" style="color:var(--yellow)">MAC ZAAB</h2>
@@ -906,8 +676,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
     <div class="marquee__track" style="--dur:22s"><span>MAC ZAAB<span class="star">✦</span></span><span>Thai Street Flavor Drop<span class="star">✦</span></span><span>So Good · So Thai<span class="star">✦</span></span><span>Limited Edition<span class="star">✦</span></span></div></div>
     </div>
   </section>
-<section data-chapter="Tom Yum Goong Burger" data-grade="warm" class="panel panel--paper" aria-label="MAC ZAAB product: Tom Yum Goong Crispy Chicken Burger">
-    <span class="panel__index" data-parallax="0.1">07</span>
+<section class="panel panel--paper" aria-label="MAC ZAAB product: Tom Yum Goong Crispy Chicken Burger">
+    <span class="panel__index">07</span>
     <div class="wrap"><div class="product "><div class="product__copy">
        <div class="hero-badge reveal"><span class="chip chip--fill">Limited Edition · Thailand Exclusive</span></div>
        <p class="eyebrow reveal">MAC ZAAB · 01 · Hero</p>
@@ -934,8 +704,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
        </div>
      </div></div></div>
   </section>
-<section data-chapter="Som Tam Shaker Fries" data-grade="warm" class="panel panel--yellow" aria-label="MAC ZAAB product: Som Tam Shaker Fries">
-    <span class="panel__index" data-parallax="0.1">08</span>
+<section class="panel panel--yellow" aria-label="MAC ZAAB product: Som Tam Shaker Fries">
+    <span class="panel__index">08</span>
     <div class="wrap"><div class="product product--rev"><div class="product__stage reveal-pop" data-parallax="0.05">
        <div class="stage-frame" style="--stage:linear-gradient(160deg,#fff3c4,#ffd966)"><model-viewer id="mv-fries" class="mv"
         src="./models/French_fries.glb"
@@ -962,8 +732,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
        <div class="ingredients reveal" style="--i:3"><span class="chip">world-famous fries</span><span class="chip">chili</span><span class="chip">lime</span><span class="chip">peanut</span><span class="chip">dried shrimp</span><span class="chip">palm sugar dust</span></div>
      </div></div></div>
   </section>
-<section data-chapter="Mango Sticky Rice McFlurry" data-grade="warm" class="panel panel--cream" aria-label="MAC ZAAB product: Mango Sticky Rice McFlurry">
-    <span class="panel__index" data-parallax="0.1">09</span>
+<section class="panel panel--cream" aria-label="MAC ZAAB product: Mango Sticky Rice McFlurry">
+    <span class="panel__index">09</span>
     <div class="wrap"><div class="product "><div class="product__copy">
        
        <p class="eyebrow reveal">MAC ZAAB · 03</p>
@@ -990,8 +760,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
        </div>
      </div></div></div>
   </section>
-<section data-chapter="Thai Iced Green Milk Tea" data-grade="warm" class="panel panel--ink" aria-label="MAC ZAAB product: Thai Iced Green Milk Tea">
-    <span class="panel__index" data-parallax="0.1">10</span>
+<section class="panel panel--ink" aria-label="MAC ZAAB product: Thai Iced Green Milk Tea">
+    <span class="panel__index">10</span>
     <div class="wrap"><div class="product product--rev"><div class="product__stage reveal-pop" data-parallax="0.05">
        <div class="stage-frame" style="--stage:linear-gradient(160deg,#1f3a2a,#2c5138)"><model-viewer id="mv-frappe" class="mv"
         src="./models/Frappe.glb"
@@ -1018,8 +788,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
        <div class="ingredients reveal" style="--i:3"><span class="chip">green tea</span><span class="chip">fresh milk</span><span class="chip">lightly sweet</span><span class="chip">iced</span></div>
      </div></div></div>
   </section>
-<section data-chapter="Pricing" data-grade="warm" class="panel panel--ink" aria-label="Pricing and combo">
-    <span class="panel__index" data-parallax="0.1">11</span>
+<section class="panel panel--ink" aria-label="Pricing and combo">
+    <span class="panel__index">11</span>
     <div class="wrap">
       <p class="eyebrow reveal" style="color:var(--yellow)">Pricing · built for a price-sensitive market</p>
       <h2 class="display d-lg kinetic">The Menu</h2>
@@ -1038,8 +808,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       </div>
     </div>
   </section>
-<section data-chapter="Marketing Plan" data-grade="warm" class="panel panel--paper" aria-label="Marketing plan">
-    <span class="panel__index" data-parallax="0.1">12</span>
+<section class="panel panel--paper" aria-label="Marketing plan">
+    <span class="panel__index">12</span>
     <div class="wrap">
       <p class="eyebrow reveal">Go-to-market · Thailand</p>
       <h2 class="display d-md kinetic">Marketing Plan</h2>
@@ -1050,8 +820,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       <div class="plan"><div class="card reveal" style="--i:0"><span class="tag">Strategy</span><h3>Positioning</h3><p>“Global brand, Thai heart.” Localize flavor &amp; value while keeping the trusted global system.</p></div><div class="card reveal" style="--i:1"><span class="tag">Reach</span><h3>Channels</h3><p>TikTok &amp; Reels — food ASMR + Thai food KOLs (lead) · LINE Official Account — coupons &amp; loyalty · Delivery apps — Grab / LINE MAN exclusives · Out-of-home — near schools &amp; BTS/MRT</p></div><div class="card reveal" style="--i:2"><span class="tag">Activation</span><h3>Events</h3><p>Pop-up launch at CentralWorld / Siam (free samples) · “Shake &amp; Sabai” TikTok challenge (meal prizes) · Collectible cup &amp; merch drop · Double loyalty points for two weeks</p></div></div>
     </div>
   </section>
-<section data-chapter="Key Takeaways" data-grade="hot" class="panel panel--red panel--center" aria-label="Closing and takeaways">
-    <span class="panel__index" data-parallax="0.1">13</span>
+<section class="panel panel--red panel--center" aria-label="Closing and takeaways">
+    <span class="panel__index">13</span>
     <div class="wrap">
       <p class="eyebrow reveal">In summary</p>
       <h2 class="display d-md kinetic">Key Takeaways</h2>
@@ -1082,13 +852,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   var panels = [].slice.call(doc.querySelectorAll('.panel'));
   var mode = 'scroll';                // 'scroll' | 'slide'
   var current = 0;                    // active slide index
-  var cinema = !body.classList.contains('no-cinema');  // film treatment ON by default
-  var lastNav = 0;                    // for whip-pan rapid-nav detection
-
-  // tiny event bus so the sound engine / 3D layer can react
-  function emit(name, detail) {
-    try { doc.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch (e) {}
-  }
 
   /* ---------- 1. Split words into animatable spans ---------- */
   function splitWords(el) {
@@ -1136,7 +899,7 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
       var e = 1 - Math.pow(1 - p, 3);            // easeOutCubic
       el.textContent = pre + fmt(target * e, sep, dec) + suf;
       if (p < 1) requestAnimationFrame(step);
-      else { el.textContent = pre + fmt(target, sep, dec) + suf; emit('mz:countdone', { el: el }); }
+      else el.textContent = pre + fmt(target, sep, dec) + suf;
     }
     requestAnimationFrame(step);
   }
@@ -1148,7 +911,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
     });
     [].forEach.call(scope.querySelectorAll('[data-count]'), countUp);
     if (window.MZ3D && window.MZ3D.onPanelShown) window.MZ3D.onPanelShown(scope);
-    emit('mz:reveal', { panel: scope });
   }
 
   // Replay reveals + count-ups from scratch (used when landing on a slide)
@@ -1199,7 +961,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
     var sc = h.scrollTop || body.scrollTop;
     var max = (h.scrollHeight - h.clientHeight) || 1;
     if (progressBar) progressBar.style.width = (sc / max * 100) + '%';
-    if (mode === 'scroll' && cinema) applyGrade(panels[nearestPanel()]);
     if (!reduceMotion && mode === 'scroll') {
       var vh = window.innerHeight;
       plx.forEach(function (el) {
@@ -1224,28 +985,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   var prevBtns = [].slice.call(doc.querySelectorAll('.slidenav .nav-prev'));
   var nextBtns = [].slice.call(doc.querySelectorAll('.slidenav .nav-next'));
   var dotsWrap = doc.querySelector('.dots');
-  var chapterEl = doc.querySelector('.chapter');
-  var chapterNo = doc.querySelector('.chapter__no');
-  var chapterT = doc.querySelector('.chapter__t');
-
-  function pad2(n) { return (n < 10 ? '0' : '') + n; }
-
-  // Set body's color-grade (per-act) + (in slide mode) the chapter title card
-  function applyGrade(panel) {
-    if (!panel) return;
-    var g = panel.getAttribute('data-grade');
-    if (g) body.setAttribute('data-grade', g);
-  }
-  function setChapter(i) {
-    if (!chapterEl) return;
-    var panel = panels[i];
-    var label = (panel && (panel.getAttribute('data-chapter') || panel.getAttribute('aria-label'))) || '';
-    if (chapterNo) chapterNo.textContent = pad2(i + 1);
-    if (chapterT) chapterT.textContent = label;
-    chapterEl.classList.remove('go');
-    void chapterEl.offsetWidth;            // restart the rise animation
-    chapterEl.classList.add('go');
-  }
 
   // build dots
   if (dotsWrap) {
@@ -1276,15 +1015,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
     var old = current;
     current = target;
 
-    // whip-pan on rapid navigation (cinema only); class cleared shortly after
-    var nowT = Date.now();
-    if (cinema && dir !== 0 && old !== current && nowT - lastNav < 280) {
-      body.classList.add('whip');
-      clearTimeout(setActive._whipTo);
-      setActive._whipTo = setTimeout(function () { body.classList.remove('whip'); }, 460);
-    }
-    lastNav = nowT;
-
     // reset every panel except the one that's about to animate out
     panels.forEach(function (p, k) { if (k !== old || dir === 0) clearAnim(p); });
 
@@ -1310,10 +1040,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
     prevBtns.forEach(function (b) { b.disabled = current === 0; });
     nextBtns.forEach(function (b) { b.disabled = current === panels.length - 1; });
     dots.forEach(function (d, k) { d.classList.toggle('on', k === current); });
-
-    applyGrade(ap);
-    setChapter(current);
-    emit('mz:slidechange', { index: current, dir: dir });
 
     replayReveal(ap);
     if (window.MZ3D && window.MZ3D.setActiveModel) window.MZ3D.setActiveModel(ap);
@@ -1383,24 +1109,7 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   if (motionBtn) motionBtn.addEventListener('click', function () { setMotion(reduceMotion); });
   applyMotion();   // sync initial state (motion on)
 
-  /* ---------- 7c. Cinema toggle (film treatment) ---------- */
-  var cinemaBtn = doc.getElementById('cinemaToggle');
-  function applyCinema() {
-    body.classList.toggle('cinema', cinema);
-    if (cinemaBtn) {
-      cinemaBtn.setAttribute('aria-pressed', String(cinema));
-      var lbl = cinemaBtn.querySelector('.lbl');
-      if (lbl) lbl.textContent = cinema ? 'Cinema: On' : 'Cinema: Off';
-    }
-    if (cinema) applyGrade(panels[mode === 'slide' ? current : nearestPanel()]);
-    else body.removeAttribute('data-grade');
-    emit('mz:cinema', { on: cinema });
-  }
-  function setCinema(on) { cinema = on; applyCinema(); }
-  if (cinemaBtn) cinemaBtn.addEventListener('click', function () { setCinema(!cinema); });
-  applyCinema();   // sync initial state (cinema on)
-
-  /* ---------- 7d. Draggable floating UI (tool window + slide bars) ---------- */
+  /* ---------- 7c. Draggable floating UI (tool window + slide bars) ---------- */
   // Drag `el` by `handle`; switches to px left/top on first drag, clamps to viewport.
   // `ignore(target)` lets a child (e.g. a button) keep its own click.
   function makeDraggable(el, handle, ignore) {
@@ -1445,7 +1154,6 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
     if (e.key === 'm' || e.key === 'M') { toggleMode(); return; }
     if (e.key === 'a' || e.key === 'A') { setMotion(reduceMotion); return; }
-    if (e.key === 'c' || e.key === 'C') { setCinema(!cinema); return; }
     if (mode === 'slide') {
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
       else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
@@ -1541,344 +1249,19 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   applyMotion(reduced());
   document.addEventListener('mz:motion', function (e) { applyMotion(e.detail.reduced); });
 
-  // Entrance: model-viewer reveals itself; we just toggle the .ready loader off,
-  // then dolly (push the camera in from a wider radius) for a cinematic reveal.
+  // Entrance: model-viewer reveals itself; we just toggle the .ready loader off
   [].forEach.call(document.querySelectorAll('model-viewer'), function (mv) {
     mv.addEventListener('load', function () {
       var stage = mv.closest('.stage-frame');
       if (stage) stage.classList.add('mv-loaded');
-      if (reduced()) return;
-      try {
-        var o = mv.getCameraOrbit();
-        var phi = toDeg(o.phi), theta = toDeg(o.theta);
-        mv.cameraOrbit = theta + 'deg ' + phi + 'deg 155%';
-        setTimeout(function () { mv.cameraOrbit = theta + 'deg ' + phi + 'deg auto'; }, 60);
-      } catch (e) {}
     });
   });
-
-  // Cinema toggle: lift exposure for a richer, filmic look
-  function applyCinema(on) {
-    [].forEach.call(document.querySelectorAll('model-viewer'), function (mv) {
-      mv.setAttribute('exposure', on ? '1.3' : '1.1');
-    });
-  }
-  applyCinema(document.body.classList.contains('cinema'));
-  document.addEventListener('mz:cinema', function (e) { applyCinema(e.detail && e.detail.on); });
 
   // No-op hooks so kinetic.js can call them uniformly
   window.MZ3D = {
     onPanelShown: function () {},
     setActiveModel: function () {}
   };
-})();
-
-</script>
-<script>
-/* ============================================================
-   MAC ZAAB — cinematic sound design (procedural, asset-free)
-   Synthesizes everything with the Web Audio API: an ambient
-   bed, slide-change whooshes, count-up impacts and reveal ticks.
-   No audio files => the offline file:// build stays self-contained.
-   Off by default; the AudioContext is created on first user
-   gesture (the Sound toggle), per browser autoplay rules.
-   ============================================================ */
-(function () {
-  'use strict';
-  var AC = window.AudioContext || window.webkitAudioContext;
-  var btn = document.getElementById('soundToggle');
-  var enabled = false;
-  var ctx = null, master = null, ambient = null, noiseBuf = null;
-  var lastTick = 0;
-
-  function now() { return ctx ? ctx.currentTime : 0; }
-
-  function makeNoise() {
-    var len = Math.floor((ctx.sampleRate || 44100) * 1);
-    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    var d = buf.getChannelData(0);
-    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    return buf;
-  }
-
-  function ensureCtx() {
-    if (ctx) return true;
-    if (!AC) return false;
-    ctx = new AC();
-    master = ctx.createGain();
-    master.gain.value = 0;
-    master.connect(ctx.destination);
-    noiseBuf = makeNoise();
-    return true;
-  }
-
-  /* ---- ambient bed: a low breathing drone + faint shimmer ---- */
-  function startAmbient() {
-    if (ambient) return;
-    var g = ctx.createGain(); g.gain.value = 0.0; g.connect(master);
-    var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420; lp.connect(g);
-
-    var o1 = ctx.createOscillator(); o1.type = 'sine'; o1.frequency.value = 55;
-    var o2 = ctx.createOscillator(); o2.type = 'sine'; o2.frequency.value = 82.5; // a fifth up
-    o1.connect(lp); o2.connect(lp);
-
-    var sh = ctx.createGain(); sh.gain.value = 0.012; sh.connect(master);
-    var o3 = ctx.createOscillator(); o3.type = 'triangle'; o3.frequency.value = 220; o3.connect(sh);
-
-    // slow "breathing" LFO on the drone level
-    var lfo = ctx.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.08;
-    var lfoG = ctx.createGain(); lfoG.gain.value = 0.018;
-    lfo.connect(lfoG); lfoG.connect(g.gain);
-
-    o1.start(); o2.start(); o3.start(); lfo.start();
-    g.gain.setTargetAtTime(0.05, now(), 2.0);
-    ambient = { g: g, nodes: [o1, o2, o3, lfo] };
-  }
-
-  /* ---- one-shot cues ---- */
-  function whoosh(dir) {
-    if (!enabled || !ctx) return;
-    var t = now();
-    var src = ctx.createBufferSource(); src.buffer = noiseBuf;
-    var bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8;
-    var g = ctx.createGain();
-    var f0 = dir < 0 ? 1600 : 320, f1 = dir < 0 ? 320 : 1700;
-    bp.frequency.setValueAtTime(f0, t);
-    bp.frequency.exponentialRampToValueAtTime(f1, t + 0.34);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.16, t + 0.06);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.38);
-    src.connect(bp); bp.connect(g); g.connect(master);
-    src.start(t); src.stop(t + 0.42);
-  }
-
-  function thump() {
-    if (!enabled || !ctx) return;
-    var t = now();
-    var o = ctx.createOscillator(); o.type = 'sine';
-    var g = ctx.createGain();
-    o.frequency.setValueAtTime(150, t);
-    o.frequency.exponentialRampToValueAtTime(58, t + 0.16);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.11, t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
-    o.connect(g); g.connect(master);
-    o.start(t); o.stop(t + 0.3);
-  }
-
-  function tick() {
-    if (!enabled || !ctx) return;
-    var t = now();
-    if (t - lastTick < 0.05) return;       // throttle bursts of reveals
-    lastTick = t;
-    var o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = 1200;
-    var g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.03, t + 0.005);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.08);
-    o.connect(g); g.connect(master);
-    o.start(t); o.stop(t + 0.1);
-  }
-
-  /* ---- enable / disable ---- */
-  function setSound(on) {
-    if (on && !ensureCtx()) return;        // no Web Audio support
-    enabled = on;
-    if (on) {
-      if (ctx.state === 'suspended') ctx.resume();
-      startAmbient();
-      master.gain.setTargetAtTime(0.9, now(), 0.4);
-    } else if (ctx) {
-      master.gain.setTargetAtTime(0.0, now(), 0.3);
-    }
-    if (btn) {
-      btn.setAttribute('aria-pressed', String(on));
-      var lbl = btn.querySelector('.lbl');
-      if (lbl) lbl.textContent = on ? 'Sound: On' : 'Sound: Off';
-    }
-  }
-
-  if (btn) btn.addEventListener('click', function () { setSound(!enabled); });
-  document.addEventListener('keydown', function (e) {
-    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-    if (e.key === 's' || e.key === 'S') setSound(!enabled);
-  });
-
-  /* ---- react to the presentation ---- */
-  document.addEventListener('mz:slidechange', function (e) { whoosh(e.detail && e.detail.dir); });
-  document.addEventListener('mz:countdone', function () { thump(); });
-  document.addEventListener('mz:reveal', function () { tick(); });
-})();
-
-</script>
-<script>
-/* ============================================================
-   MAC ZAAB — "Backrooms" end-of-deck prank (auto)
-   Auto-armed: when the final slide has been on screen for 5s, the
-   page glitches into a liminal / 90s-handcam backrooms scene with a
-   low fluorescent hum, then returns to the closing slide.
-   Type the secret "boo" to disable it (e.g. during rehearsal) and
-   "boo" again to re-enable.
-   Pure CSS scene + procedural Web Audio => offline file://-safe.
-   ============================================================ */
-(function () {
-  'use strict';
-  var doc = document, body = doc.body;
-  var panels = [].slice.call(doc.querySelectorAll('.panel'));
-  if (!panels.length) return;
-  var lastPanel = panels[panels.length - 1];
-  var lastIdx = panels.length - 1;
-
-  var armed = true, firing = false, fired = false, curIdx = 0;
-  var timer = null, overlay = null;
-  var DELAY = 5000;     // time on the last slide before it fires
-  var DURATION = 2600;  // how long the end scene stays before returning
-  var INTRO = 3000;     // opening "cold open" length on page load
-
-  function reduced() { return body.classList.contains('reduce-motion'); }
-
-  /* ---------- tiny presenter-only toast ---------- */
-  var toast = null, toastTo = null;
-  function showToast(msg) {
-    if (!toast) { toast = doc.createElement('div'); toast.className = 'prank-toast'; body.appendChild(toast); }
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(toastTo);
-    toastTo = setTimeout(function () { toast.classList.remove('show'); }, 1300);
-  }
-
-  /* ---------- audio: fluorescent hum + low drone (no scream) ---------- */
-  var AC = window.AudioContext || window.webkitAudioContext;
-  var actx = null, master = null, hum = null;
-  function ensureCtx() {
-    if (actx || !AC) return;
-    actx = new AC();
-    master = actx.createGain(); master.gain.value = 0; master.connect(actx.destination);
-  }
-  function unlock() { ensureCtx(); if (actx && actx.state === 'suspended') actx.resume(); }
-  doc.addEventListener('pointerdown', unlock, true);
-  doc.addEventListener('keydown', unlock, true);
-
-  function startHum() {
-    if (!actx) return;
-    if (actx.state === 'suspended') actx.resume();
-    var g = actx.createGain(); g.gain.value = 0; g.connect(master);
-    var lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; lp.connect(g);
-    var o1 = actx.createOscillator(); o1.type = 'sawtooth'; o1.frequency.value = 60; o1.connect(lp);
-    var o2 = actx.createOscillator(); o2.type = 'square'; o2.frequency.value = 120; o2.connect(lp);
-    var dg = actx.createGain(); dg.gain.value = 0.5; dg.connect(g);
-    var d = actx.createOscillator(); d.type = 'sine'; d.frequency.value = 42; d.connect(dg);
-    // flicker tremolo so the hum "buzzes" like a dying tube
-    var lfo = actx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 8;
-    var lfoG = actx.createGain(); lfoG.gain.value = 0.22; lfo.connect(lfoG); lfoG.connect(g.gain);
-    o1.start(); o2.start(); d.start(); lfo.start();
-    var t = actx.currentTime;
-    master.gain.setTargetAtTime(0.9, t, 0.04);
-    g.gain.setTargetAtTime(0.2, t, 0.06);
-    hum = { g: g, nodes: [o1, o2, d, lfo] };
-  }
-  function stopHum() {
-    if (!actx || !hum) return;
-    var t = actx.currentTime, h = hum; hum = null;
-    h.g.gain.setTargetAtTime(0, t, 0.12);
-    master.gain.setTargetAtTime(0, t, 0.18);
-    setTimeout(function () { h.nodes.forEach(function (n) { try { n.stop(); } catch (e) {} }); }, 600);
-  }
-
-  /* ---------- the scene ---------- */
-  function buildOverlay() {
-    overlay = doc.createElement('div');
-    overlay.className = 'br';
-    overlay.setAttribute('aria-hidden', 'true');
-    overlay.innerHTML =
-      '<div class="br__cam"><div class="br__shake"><div class="br__scene">' +
-        '<div class="br__wall-l"></div><div class="br__wall-r"></div>' +
-        '<div class="br__ceiling"></div><div class="br__floor"></div>' +
-        '<div class="br__back"></div>' +
-        '<div class="br__light l1"></div><div class="br__light l2"></div>' +
-        '<div class="br__light l3"></div><div class="br__light l4"></div>' +
-      '</div></div></div>' +
-      '<div class="br__track"></div>' +
-      '<div class="br__grain"></div><div class="br__scan"></div>' +
-      '<div class="br__vig"></div><div class="br__flicker"></div>' +
-      '<div class="br__hud">' +
-        '<div class="br__rec"><b></b>REC</div>' +
-        '<div class="br__bat">▮▮▮ 89%</div>' +
-        '<div class="br__time">PM&nbsp;11:58&nbsp;&nbsp;06&nbsp;15&nbsp;1996</div>' +
-      '</div>';
-    body.appendChild(overlay);
-  }
-
-  function onLast() {
-    var mode = (window.MZKinetic && window.MZKinetic.getMode) ? window.MZKinetic.getMode() : 'scroll';
-    if (mode === 'slide') return curIdx === lastIdx;
-    var r = lastPanel.getBoundingClientRect();
-    return r.top < window.innerHeight * 0.6 && r.bottom > window.innerHeight * 0.2;
-  }
-
-  function schedule() {
-    if (!armed || firing || fired) return;
-    clearTimeout(timer);
-    if (onLast()) timer = setTimeout(fire, DELAY);
-  }
-  function cancel() { clearTimeout(timer); timer = null; }
-
-  function runScene(duration, skippable) {
-    if (firing) return;
-    firing = true;
-    buildOverlay();
-    body.classList.add('backrooms-on');
-    startHum();
-    var to = setTimeout(endScene, duration);
-    if (skippable && overlay) {
-      overlay.addEventListener('pointerdown', function () { clearTimeout(to); endScene(); }, { once: true });
-    }
-  }
-  function endScene() {
-    stopHum();
-    if (overlay) overlay.classList.add('br--out');
-    setTimeout(function () {
-      if (overlay) { overlay.parentNode && overlay.parentNode.removeChild(overlay); overlay = null; }
-      body.classList.remove('backrooms-on');
-      firing = false;
-    }, 650);
-  }
-
-  function fire() {
-    if (firing || fired || !armed || !onLast()) return;
-    fired = true;                            // one-shot per page load
-    runScene(DURATION, false);
-  }
-
-  /* ---------- secret arm / disarm: type "boo" ---------- */
-  function toggleArm() {
-    armed = !armed;
-    if (armed) fired = false;                // allow another run after re-enabling
-    showToast(armed ? '👻 prank: AUTO (on)' : '⏹ prank: off');
-    if (armed) schedule(); else cancel();
-  }
-  var seq = '';
-  doc.addEventListener('keydown', function (e) {
-    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-    var k = (e.key || '').toLowerCase();
-    if (k.length !== 1) return;
-    seq = (seq + k).slice(-6);
-    if (seq.indexOf('boo') >= 0) { seq = ''; toggleArm(); }
-  });
-
-  /* ---------- react to navigation ---------- */
-  doc.addEventListener('mz:slidechange', function (e) {
-    curIdx = (e.detail && typeof e.detail.index === 'number') ? e.detail.index : curIdx;
-    if (curIdx === lastIdx) schedule(); else cancel();
-  });
-  doc.addEventListener('mz:reveal', function (e) {
-    if (e.detail && e.detail.panel === lastPanel) schedule(); else cancel();
-  });
-
-  /* ---------- opening cold-open: flash the backrooms on load ---------- */
-  function intro() { runScene(INTRO, true); }    // tap/click to skip (also unlocks audio)
-  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', intro);
-  else intro();
 })();
 
 </script>
