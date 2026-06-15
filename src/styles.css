@@ -454,137 +454,6 @@ body.reduce-motion .kinetic .word>span{transform:none}
 body.reduce-motion .reveal,body.reduce-motion .reveal-l,body.reduce-motion .reveal-pop{opacity:1;transform:none}
 body.reduce-motion .marquee__track{animation:none;transform:none}
 
-/* ============================================================
-   CINEMA MODE — film overlays, color grade, rack focus,
-   bloom, letterbox, chapter titling, title sequence.
-   All gated behind body.cinema (toggle, default ON). Pure CSS,
-   no external assets (grain is an inline SVG data URI), so the
-   offline file:// build stays self-contained.
-   ============================================================ */
-
-/* Overlay host — never intercepts pointer events */
-.cine{position:fixed;inset:0;z-index:40;pointer-events:none}
-.cine>*{pointer-events:none}
-
-/* --- 10. Per-act color grade (cool research -> warm/hot product) --- */
-.cine__grade{
-  position:fixed;inset:0;z-index:40;opacity:0;mix-blend-mode:soft-light;
-  background:transparent;
-  transition:background 1.2s var(--ease),opacity 1.2s var(--ease);
-}
-body.cinema .cine__grade{opacity:.55}
-body.cinema[data-grade="cool"] .cine__grade{background:linear-gradient(180deg,#1d4470,#0a1a33)}
-body.cinema[data-grade="warm"] .cine__grade{background:linear-gradient(180deg,#6a3b12,#2a1606)}
-body.cinema[data-grade="hot"]  .cine__grade{background:radial-gradient(120% 100% at 50% 28%,#8a3300,#260c00)}
-
-/* --- 5. Vignette --- */
-.cine__vig{
-  position:fixed;inset:0;z-index:45;opacity:0;mix-blend-mode:multiply;
-  background:radial-gradient(125% 100% at 50% 48%,transparent 52%,rgba(0,0,0,.34) 100%);
-  transition:opacity 1s var(--ease);
-}
-body.cinema .cine__vig{opacity:1}
-
-/* --- 5. Film grain (animated inline-SVG noise) --- */
-.cine__grain{
-  position:fixed;inset:-60%;z-index:55;opacity:0;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:200px 200px;
-}
-body.cinema .cine__grain{opacity:.06}
-body.cinema:not(.reduce-motion) .cine__grain{animation:cineGrain 1.6s steps(5) infinite}
-@keyframes cineGrain{
-  0%{transform:translate3d(0,0,0)}      20%{transform:translate3d(-3%,2%,0)}
-  40%{transform:translate3d(2%,-3%,0)}  60%{transform:translate3d(-2%,1%,0)}
-  80%{transform:translate3d(3%,2%,0)}   100%{transform:translate3d(0,0,0)}
-}
-
-/* --- 1. Letterbox bars (slide mode only) --- */
-.cine__bar{position:fixed;left:0;right:0;height:0;background:#000;z-index:58;transition:height .6s var(--ease)}
-.cine__bar--t{top:0}
-.cine__bar--b{bottom:0}
-body.cinema.mode-slide .cine__bar{height:clamp(20px,5.5vh,62px)}
-
-/* --- 1. Chapter title card (sits inside the bottom bar, slide mode) --- */
-.chapter{
-  position:fixed;left:var(--pad);bottom:0;z-index:59;
-  height:clamp(20px,5.5vh,62px);display:flex;align-items:center;gap:12px;
-  opacity:0;transition:opacity .5s var(--ease);
-}
-body.cinema.mode-slide .chapter{opacity:1}
-.chapter__no{font-family:var(--disp);font-size:clamp(14px,2.2vw,26px);line-height:1;color:var(--yellow);letter-spacing:.02em}
-.chapter__clip{overflow:hidden;display:inline-block}
-.chapter__t{
-  display:inline-block;font-family:var(--disp);text-transform:uppercase;
-  font-size:clamp(12px,1.5vw,20px);letter-spacing:.04em;color:#fff;line-height:1.1;
-}
-.chapter.go .chapter__t{animation:chapRise .6s var(--ease) both}
-@keyframes chapRise{from{opacity:0;transform:translateY(115%)}to{opacity:1;transform:none}}
-
-/* --- 3. Rack focus: stage blurs in, snaps sharp on reveal --- */
-body.cinema .stage-frame{transition:filter 1.1s var(--ease),transform 30s ease-in-out}
-body.cinema .product__stage:not(.in) .stage-frame{filter:blur(20px) saturate(.6) brightness(1.06)}
-body.cinema .product__stage.in .stage-frame{filter:blur(0) saturate(1)}
-
-/* --- 5. Bloom-style screen-blend glow over the product --- */
-body.cinema .stage-frame::before{
-  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  mix-blend-mode:screen;opacity:0;transition:opacity 1.2s var(--ease);
-  background:radial-gradient(58% 50% at 50% 38%,rgba(255,243,205,.22),transparent 70%);
-}
-body.cinema .product__stage.in .stage-frame::before{opacity:1}
-body.cinema:not(.reduce-motion) .product__stage.in .stage-frame::before{animation:bloomPulse 5.5s var(--ease) infinite}
-@keyframes bloomPulse{0%,100%{opacity:.5}50%{opacity:.95}}
-
-/* --- 7. Ken Burns: slow drift on the product stages --- */
-body.cinema:not(.reduce-motion) .product__stage.in .stage-frame{animation:kenburns 30s ease-in-out infinite alternate}
-@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.035)}}
-
-/* --- 9. Title sequence: overshoot + glow on the marquee titles --- */
-body.cinema .panel[data-chapter="Title"] .display.kinetic.in .word>span,
-body.cinema .panel[data-chapter="MAC ZAAB"] .display.kinetic.in .word>span{
-  animation:titleIn .95s var(--ease) both;
-  animation-delay:calc(var(--i,0)*70ms);
-}
-@keyframes titleIn{
-  0%{opacity:0;transform:translateY(118%) rotate(7deg)}
-  62%{opacity:1;transform:translateY(-7%) rotate(-1.4deg)}
-  100%{transform:translateY(0) rotate(0)}
-}
-body.cinema .panel[data-chapter="Title"] .d-xl.in,
-body.cinema .panel[data-chapter="MAC ZAAB"] .d-xl.in{animation:titleGlow 2.6s var(--ease) .25s both}
-@keyframes titleGlow{
-  0%{text-shadow:0 0 30px rgba(255,199,44,0)}
-  42%{text-shadow:0 0 44px rgba(255,199,44,.55)}
-  100%{text-shadow:0 0 0 rgba(255,199,44,0)}
-}
-
-/* --- 6. Cinematic slide transitions: add blur to the push --- */
-body.cinema.mode-slide .panel.from-next{animation:slEnterNextC .66s var(--ease) both}
-body.cinema.mode-slide .panel.from-prev{animation:slEnterPrevC .66s var(--ease) both}
-body.cinema.mode-slide .panel.from-init{animation:slEnterInitC .6s var(--ease) both}
-body.cinema.mode-slide .panel.leave-next{animation:slLeaveNextC .52s var(--ease-out) both}
-body.cinema.mode-slide .panel.leave-prev{animation:slLeavePrevC .52s var(--ease-out) both}
-@keyframes slEnterNextC{from{opacity:0;filter:blur(14px);transform:translate3d(9%,3%,0) scale(.92)}to{opacity:1;filter:blur(0);transform:none}}
-@keyframes slEnterPrevC{from{opacity:0;filter:blur(14px);transform:translate3d(-9%,-3%,0) scale(.92)}to{opacity:1;filter:blur(0);transform:none}}
-@keyframes slEnterInitC{from{opacity:0;filter:blur(10px);transform:scale(.96)}to{opacity:1;filter:blur(0);transform:none}}
-@keyframes slLeaveNextC{from{opacity:1;filter:blur(0);transform:none}to{opacity:0;filter:blur(12px);transform:translate3d(-8%,-3%,0) scale(.92)}}
-@keyframes slLeavePrevC{from{opacity:1;filter:blur(0);transform:none}to{opacity:0;filter:blur(12px);transform:translate3d(8%,3%,0) scale(.92)}}
-
-/* --- 6. Whip-pan: stronger blur on rapid navigation --- */
-body.cinema.mode-slide.whip .panel.from-next{animation:whipNext .4s var(--ease-out) both}
-body.cinema.mode-slide.whip .panel.from-prev{animation:whipPrev .4s var(--ease-out) both}
-@keyframes whipNext{0%{opacity:.2;filter:blur(26px);transform:translate3d(30%,0,0)}100%{opacity:1;filter:blur(0);transform:none}}
-@keyframes whipPrev{0%{opacity:.2;filter:blur(26px);transform:translate3d(-30%,0,0)}100%{opacity:1;filter:blur(0);transform:none}}
-
-/* Sound toggle button states (mirrors the motion toggle look) */
-.ctrl-btn--sound[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--yellow)}
-.ctrl-btn--sound[aria-pressed="false"]{background:var(--paper);border-color:var(--ink);color:var(--ink);opacity:.72}
-.ctrl-btn--cinema[aria-pressed="false"]{background:var(--paper);border-color:var(--ink);color:var(--ink);opacity:.72}
-
-/* Keep film overlays from fighting reduced-motion (statics still show) */
-body.reduce-motion .cine__grain{animation:none}
-body.reduce-motion .stage-frame{animation:none !important}
 
 /* ============================================================
    Interactive brand mark — McDonald's Golden Arches
@@ -615,24 +484,24 @@ body:not(.reduce-motion) .brandmark .arches{animation:archBob 4.6s ease-in-out i
    + disclaimer pushed it past one viewport; these scoped rules
    shrink it to fit (and trim decorations on short displays).
    ============================================================ */
-.panel[data-chapter="Title"]{padding-top:clamp(40px,7vh,92px);padding-bottom:clamp(40px,7vh,92px)}
-.panel[data-chapter="Title"] .brandmark{width:clamp(58px,8vw,112px);margin:0 0 6px}
-.panel[data-chapter="Title"] .brandmark__note{margin:0 0 12px}
-.panel[data-chapter="Title"] .eyebrow{margin-bottom:10px}
-.panel[data-chapter="Title"] .d-xl{font-size:clamp(34px,7vw,108px)}
-.panel[data-chapter="Title"] .lead{font-size:clamp(15px,1.5vw,21px)}
-.panel[data-chapter="Title"] .marquee{margin:clamp(14px,2.4vw,30px) 0}
-.panel[data-chapter="Title"] .teaser{min-height:clamp(120px,18vw,220px);margin-top:clamp(16px,2.6vw,40px)}
+.deck>.panel:first-child{padding-top:clamp(40px,7vh,92px);padding-bottom:clamp(40px,7vh,92px)}
+.deck>.panel:first-child .brandmark{width:clamp(58px,8vw,112px);margin:0 0 6px}
+.deck>.panel:first-child .brandmark__note{margin:0 0 12px}
+.deck>.panel:first-child .eyebrow{margin-bottom:10px}
+.deck>.panel:first-child .d-xl{font-size:clamp(34px,7vw,108px)}
+.deck>.panel:first-child .lead{font-size:clamp(15px,1.5vw,21px)}
+.deck>.panel:first-child .marquee{margin:clamp(14px,2.4vw,30px) 0}
+.deck>.panel:first-child .teaser{min-height:clamp(120px,18vw,220px);margin-top:clamp(16px,2.6vw,40px)}
 @media (max-height:720px){
-  .panel[data-chapter="Title"] .teaser{min-height:0}
-  .panel[data-chapter="Title"] .teaser .tcard{aspect-ratio:auto;height:clamp(78px,15vh,134px)}
-  .panel[data-chapter="Title"] .marquee{margin:10px 0}
-  .panel[data-chapter="Title"] .teaser ~ p{display:none}   /* drop the "press M" tip */
+  .deck>.panel:first-child .teaser{min-height:0}
+  .deck>.panel:first-child .teaser .tcard{aspect-ratio:auto;height:clamp(78px,15vh,134px)}
+  .deck>.panel:first-child .marquee{margin:10px 0}
+  .deck>.panel:first-child .teaser ~ p{display:none}   /* drop the "press M" tip */
 }
 
 /* ============================================================
    Touchscreen / TV hardening — every keyboard action also has an
-   on-screen control (Mode/Motion/Cinema/Sound in the tool window,
+   on-screen control (Mode/Motion in the tool window,
    prev/next on the nav bars, dots). Drags use Pointer Events so
    they work with touch. These rules give fast taps, no long-press
    callout / tap-flash, and bigger touch targets.
@@ -647,84 +516,3 @@ button{touch-action:manipulation}
 .dots button{width:16px;height:16px;border-width:2px}
 /* keep the side nav bars comfortably tappable */
 .nav-btn{width:46px;height:46px;font-size:20px}
-
-/* ============================================================
-   "BACKROOMS" prank scene (liminal / A24 vibe) — armed via a
-   secret key, fires at the end of the deck, then returns. Pure
-   CSS + inline-SVG grain, so the offline file:// build still works.
-   No faces, no text — atmosphere + flicker + VHS only.
-   ============================================================ */
-body.backrooms-on{cursor:none}
-.br{
-  position:fixed;inset:0;z-index:99999;overflow:hidden;background:#9c8d33;
-  filter:saturate(1.18) contrast(1.07);
-  animation:brIn .22s ease both;
-}
-.br.br--out{opacity:0;transition:opacity .6s ease}
-@keyframes brIn{from{opacity:0}to{opacity:1}}
-
-/* camera sway (found-footage handheld) + fast shake (separate layers) */
-.br__cam{position:absolute;inset:-5%}
-.br__shake{position:absolute;inset:0}
-body:not(.reduce-motion) .br__cam{animation:brSway 7s ease-in-out infinite}
-body:not(.reduce-motion) .br__shake{animation:brShake .2s steps(2,end) infinite}
-@keyframes brSway{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(1.1%,-.8%) rotate(.3deg)}50%{transform:translate(-.8%,1%) rotate(-.2deg)}75%{transform:translate(.6%,.4%) rotate(.15deg)}}
-@keyframes brShake{0%{transform:translate(0,0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-3px)}80%{transform:translate(2px,3px)}100%{transform:translate(0,0)}}
-
-/* one-point-perspective corridor built from clip-path trapezoids */
-.br__scene{position:absolute;inset:0;background:#b3a23a}
-.br__scene>div{position:absolute;inset:0}
-.br__ceiling{background:linear-gradient(#cfc169,#a99a3c);clip-path:polygon(0 0,100% 0,68% 33%,32% 33%)}
-.br__floor{background:linear-gradient(#7d7128,#9a8c34);clip-path:polygon(0 100%,100% 100%,68% 67%,32% 67%)}
-.br__wall-l{background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 7px,transparent 7px 16px),linear-gradient(90deg,#8a7c2e,#5f5520);clip-path:polygon(0 0,32% 33%,32% 67%,0 100%)}
-.br__wall-r{background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 7px,transparent 7px 16px),linear-gradient(270deg,#8a7c2e,#5f5520);clip-path:polygon(100% 0,68% 33%,68% 67%,100% 100%)}
-.br__back{position:absolute;left:32%;top:33%;width:36%;height:34%;
-  background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 8px,transparent 8px 18px),linear-gradient(#9c8d33,#7d7026);
-  box-shadow:inset 0 0 60px rgba(0,0,0,.45)}
-
-/* receding fluorescent ceiling panels (flicker) */
-.br__light{position:absolute;left:50%;transform:translateX(-50%);background:#fbf4c0;border-radius:2px;
-  box-shadow:0 0 26px 7px rgba(255,246,190,.75)}
-.br__light.l1{top:6%;width:16%;height:2.4%}
-.br__light.l2{top:14%;width:11%;height:1.9%}
-.br__light.l3{top:21%;width:7.5%;height:1.4%}
-.br__light.l4{top:27%;width:4.5%;height:1%}
-body:not(.reduce-motion) .br__light{animation:brFlick 3.1s steps(1) infinite}
-.br__light.l2{animation-delay:.6s}
-.br__light.l3{animation-delay:1.3s}
-.br__light.l4{animation-delay:.9s}
-@keyframes brFlick{0%,100%{opacity:1}7%{opacity:.35}9%{opacity:1}54%{opacity:1}56%{opacity:.18}58%{opacity:.9}81%{opacity:1}83%{opacity:.5}85%{opacity:1}}
-
-/* VHS / TV overlays (steady, not shaken) */
-.br__grain{position:absolute;inset:-50%;opacity:.13;mix-blend-mode:overlay;background-size:180px 180px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-body:not(.reduce-motion) .br__grain{animation:cineGrain 1.2s steps(5) infinite}
-.br__scan{position:absolute;inset:0;mix-blend-mode:multiply;opacity:.5;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
-.br__vig{position:absolute;inset:0;background:radial-gradient(120% 92% at 50% 45%,transparent 44%,rgba(0,0,0,.72) 100%)}
-.br__flicker{position:absolute;inset:0;background:#000;opacity:0}
-body:not(.reduce-motion) .br__flicker{animation:brBlackFlick 5s steps(1) infinite}
-@keyframes brBlackFlick{0%,100%{opacity:0}48%{opacity:0}49%{opacity:.5}50%{opacity:0}77%{opacity:0}78%{opacity:.32}79%{opacity:0}}
-
-/* VHS tracking band sweeping up the frame (90s handcam) */
-.br__track{position:absolute;left:0;right:0;top:110%;height:9%;opacity:.5;mix-blend-mode:screen;filter:blur(1px);
-  background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.22),rgba(255,255,255,0))}
-body:not(.reduce-motion) .br__track{animation:brTrack 6s linear infinite}
-@keyframes brTrack{0%{top:110%}100%{top:-20%}}
-
-/* old camcorder HUD: REC, battery, timestamp (90s handcam UI, no scary text) */
-.br__hud{position:absolute;inset:0;font-family:'Courier New',monospace;color:#f6f6f6;
-  text-shadow:0 0 4px rgba(0,0,0,.85);opacity:.92}
-.br__rec{position:absolute;top:5%;right:6%;display:flex;align-items:center;gap:8px;
-  font-size:clamp(12px,1.6vw,18px);letter-spacing:.14em}
-.br__rec b{width:.7em;height:.7em;border-radius:50%;background:#ff2a2a;display:inline-block;box-shadow:0 0 8px #ff2a2a}
-body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
-@keyframes recBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
-.br__bat{position:absolute;top:5%;left:6%;font-size:clamp(11px,1.4vw,16px);letter-spacing:.1em}
-.br__time{position:absolute;bottom:5%;left:6%;font-size:clamp(12px,1.6vw,18px);letter-spacing:.08em}
-
-/* tiny presenter-only toast confirming armed/disarmed (not shown to the friend) */
-.prank-toast{position:fixed;left:14px;bottom:14px;z-index:100000;pointer-events:none;
-  background:rgba(0,0,0,.82);color:#ffd23c;font-family:var(--body);font-weight:800;
-  font-size:12px;letter-spacing:.08em;padding:8px 13px;border-radius:10px;
-  opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
-.prank-toast.show{opacity:1;transform:none}
