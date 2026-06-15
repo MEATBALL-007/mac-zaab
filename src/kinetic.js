@@ -351,6 +351,34 @@
     });
   }
 
+  /* ---------- 8c. Price reveal (เซียมซี-style roll, locked price) ---------- */
+  [].forEach.call(doc.querySelectorAll('.price-reveal'), function (wrap) {
+    var btn = wrap.querySelector('.price-btn');
+    var price = wrap.querySelector('.price');
+    var val = wrap.querySelector('.price-val');
+    var target = parseInt(wrap.getAttribute('data-price'), 10) || 0;
+    if (!btn || !price || !val) return;
+    var done = false;
+    function finish() {
+      price.classList.remove('rolling');
+      val.textContent = String(target);          // always the locked price
+      price.classList.add('revealed');
+      wrap.classList.add('done');
+    }
+    btn.addEventListener('click', function () {
+      if (done) return;
+      done = true;
+      btn.disabled = true;
+      if (reduceMotion) { finish(); return; }
+      price.classList.add('rolling');
+      var t0 = Date.now();
+      var iv = setInterval(function () {
+        val.textContent = String(Math.floor(Math.random() * 90) + 10);  // suspense only
+        if (Date.now() - t0 > 1100) { clearInterval(iv); finish(); }
+      }, 60);
+    });
+  });
+
   /* ---------- 9. Init ---------- */
   observeAll();
   // reveal whatever is already on-screen at load
