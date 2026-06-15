@@ -127,8 +127,8 @@ function productPanel(build, p, n) {
        <p class="eyebrow reveal">${p.eyebrow}</p>
        <h2 class="display d-md kinetic">${p.title}</h2>
        ${thai}
-       <div class="price-reveal reveal" style="--i:1" data-price="${p.price}">
-         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+       <div class="price-reveal reveal" style="--i:1">
+         <p class="price"><span class="cur">฿</span><span class="price-val" data-price="${p.price}">???</span></p>
          <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for ${p.title}">
            <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
          </button>
@@ -152,10 +152,10 @@ function marquee(words, { rev = false, dur = 26, bare = false } = {}) {
 
 function heroPanel() {
   const tcards = [
-    { n: 'Tom Yum Goong Burger', p: '฿79', r: -8, y: 18, bg: 'linear-gradient(160deg,#DA291C,#8f1810)' },
-    { n: 'Som Tam Shaker Fries', p: '฿49', r: -3, y: -6, bg: 'linear-gradient(160deg,#FFC72C,#e0a200)', dark: true },
-    { n: 'Mango Sticky Rice McFlurry', p: '฿45', r: 3, y: -6, bg: 'linear-gradient(160deg,#f6b73c,#d98a1c)', dark: true },
-    { n: 'Thai Iced Green Milk Tea', p: '฿39', r: 8, y: 18, bg: 'linear-gradient(160deg,#2c5138,#16301f)' }
+    { n: 'Tom Yum Goong Burger', p: '฿??', r: -8, y: 18, bg: 'linear-gradient(160deg,#DA291C,#8f1810)' },
+    { n: 'Som Tam Shaker Fries', p: '฿??', r: -3, y: -6, bg: 'linear-gradient(160deg,#FFC72C,#e0a200)', dark: true },
+    { n: 'Mango Sticky Rice McFlurry', p: '฿??', r: 3, y: -6, bg: 'linear-gradient(160deg,#f6b73c,#d98a1c)', dark: true },
+    { n: 'Thai Iced Green Milk Tea', p: '฿??', r: 8, y: 18, bg: 'linear-gradient(160deg,#2c5138,#16301f)' }
   ].map((c) => `<div class="tcard" style="--r:${c.r}deg;--y:${c.y}px;background:${c.bg};${c.dark ? 'color:#1A1A1A;border-color:rgba(26,26,26,.35);' : ''}">
        <span class="q" aria-hidden="true">?</span>
        <span class="tprice">${c.p}</span>${c.n}</div>`).join('');
@@ -310,18 +310,21 @@ function pricingPanel() {
     ['Mango Sticky Rice McFlurry', 45],
     ['Thai Iced Green Milk Tea', 39]
   ].map(([n, p], i) => `<div class="menu__item reveal-l" style="--i:${i}">
-      <span class="nm">${n}</span><span class="pr">฿${num(p)}</span></div>`).join('');
+      <span class="nm">${n}</span><span class="pr">฿<span class="price-val" data-price="${p}">???</span></span></div>`).join('');
   return `<section class="panel panel--ink" aria-label="Pricing and combo">
     <span class="panel__index">11</span>
     <div class="wrap">
       <p class="eyebrow reveal" style="color:var(--yellow)">Pricing · built for a price-sensitive market</p>
       <h2 class="display d-lg kinetic">The Menu</h2>
       <div class="menu" style="margin-top:clamp(22px,4vw,40px)">${items}</div>
+      <button type="button" class="btn btn--solid price-btn menu-reveal-btn reveal" style="--i:1;margin-top:18px" aria-label="Reveal all prices">
+        <span class="ico" aria-hidden="true">🥠</span> เผยราคาทั้งหมด · Reveal all prices
+      </button>
       <div class="combo reveal-pop">
         <div>
           <p class="tag" style="font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.7">The value anchor</p>
-          <div class="big">THE ZAAB SET<br>฿${num(149)}</div>
-          <p class="small" style="margin-top:8px">Burger + Shaker Fries + Drink. Add the Mango Sticky Rice McFlurry for just <b>+฿29</b>.</p>
+          <div class="big">THE ZAAB SET<br>฿<span class="price-val" data-price="149">???</span></div>
+          <p class="small" style="margin-top:8px">Burger + Shaker Fries + Drink. Add the Mango Sticky Rice McFlurry for just <b>+฿<span class="price-val" data-price="29">??</span></b>.</p>
         </div>
         <span class="chip" style="border-width:2px">Burger + Fries + Drink</span>
       </div>

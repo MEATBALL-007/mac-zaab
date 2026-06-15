@@ -531,9 +531,10 @@ button{touch-action:manipulation}
    ============================================================ */
 .price-reveal{margin:.15em 0 1.1em}
 .price-reveal .price{margin:0}
-.price-val{display:inline-block;min-width:2.2ch}
+.price-val{display:inline-block;min-width:1.8ch}
 .price-btn{margin-top:14px}
-.price.rolling .price-val{color:var(--red);animation:priceShake .11s steps(2) infinite}
+.price-btn.is-done{display:none}
+.price-val.rolling{color:var(--red);animation:priceShake .11s steps(2) infinite}
 @keyframes priceShake{
   0%{transform:translate(0,0) rotate(0)}
   25%{transform:translate(-2px,1px) rotate(-2.5deg)}
@@ -541,9 +542,8 @@ button{touch-action:manipulation}
   75%{transform:translate(-1px,2px) rotate(-1deg)}
   100%{transform:translate(1px,-2px) rotate(2deg)}
 }
-.price.revealed .price-val{animation:pricePop .6s var(--ease) both}
+.price-val.revealed{animation:pricePop .6s var(--ease) both}
 @keyframes pricePop{0%{transform:scale(.4);opacity:.15}55%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
-.price-reveal.done .price-btn{display:none}
 
 </style>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
@@ -597,13 +597,13 @@ button{touch-action:manipulation}
     <div class="marquee__track" style="--dur:30s"><span>Glocalization<span class="star">✦</span></span><span>Thai Street Flavor<span class="star">✦</span></span><span>Spicy-Sour<span class="star">✦</span></span><span>Digital-First<span class="star">✦</span></span><span>Value<span class="star">✦</span></span><span>MAC ZAAB<span class="star">✦</span></span></div></div>
       <div class="teaser" aria-hidden="true"><div class="tcard" style="--r:-8deg;--y:18px;background:linear-gradient(160deg,#DA291C,#8f1810);">
        <span class="q" aria-hidden="true">?</span>
-       <span class="tprice">฿79</span>Tom Yum Goong Burger</div><div class="tcard" style="--r:-3deg;--y:-6px;background:linear-gradient(160deg,#FFC72C,#e0a200);color:#1A1A1A;border-color:rgba(26,26,26,.35);">
+       <span class="tprice">฿??</span>Tom Yum Goong Burger</div><div class="tcard" style="--r:-3deg;--y:-6px;background:linear-gradient(160deg,#FFC72C,#e0a200);color:#1A1A1A;border-color:rgba(26,26,26,.35);">
        <span class="q" aria-hidden="true">?</span>
-       <span class="tprice">฿49</span>Som Tam Shaker Fries</div><div class="tcard" style="--r:3deg;--y:-6px;background:linear-gradient(160deg,#f6b73c,#d98a1c);color:#1A1A1A;border-color:rgba(26,26,26,.35);">
+       <span class="tprice">฿??</span>Som Tam Shaker Fries</div><div class="tcard" style="--r:3deg;--y:-6px;background:linear-gradient(160deg,#f6b73c,#d98a1c);color:#1A1A1A;border-color:rgba(26,26,26,.35);">
        <span class="q" aria-hidden="true">?</span>
-       <span class="tprice">฿45</span>Mango Sticky Rice McFlurry</div><div class="tcard" style="--r:8deg;--y:18px;background:linear-gradient(160deg,#2c5138,#16301f);">
+       <span class="tprice">฿??</span>Mango Sticky Rice McFlurry</div><div class="tcard" style="--r:8deg;--y:18px;background:linear-gradient(160deg,#2c5138,#16301f);">
        <span class="q" aria-hidden="true">?</span>
-       <span class="tprice">฿39</span>Thai Iced Green Milk Tea</div></div>
+       <span class="tprice">฿??</span>Thai Iced Green Milk Tea</div></div>
       <p class="reveal" style="--i:2;margin-top:26px;font-weight:700;opacity:.7;font-size:13px;letter-spacing:.14em;text-transform:uppercase">
         Tip — press <b>M</b> or use the top-right button to switch Scroll ↔ Slide mode</p>
     </div>
@@ -704,8 +704,8 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 01 · Hero</p>
        <h2 class="display d-md kinetic">Tom Yum Goong Crispy Chicken Burger</h2>
        <p class="thai reveal" style="--i:1">เบอร์เกอร์ไก่กรอบต้มยำกุ้ง</p>
-       <div class="price-reveal reveal" style="--i:1" data-price="79">
-         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+       <div class="price-reveal reveal" style="--i:1">
+         <p class="price"><span class="cur">฿</span><span class="price-val" data-price="79">???</span></p>
          <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Tom Yum Goong Crispy Chicken Burger">
            <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
          </button>
@@ -753,8 +753,8 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 02</p>
        <h2 class="display d-md kinetic">Som Tam Shaker Fries</h2>
        <p class="thai reveal" style="--i:1">เฟรนช์ฟรายส์ส้มตำ</p>
-       <div class="price-reveal reveal" style="--i:1" data-price="49">
-         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+       <div class="price-reveal reveal" style="--i:1">
+         <p class="price"><span class="cur">฿</span><span class="price-val" data-price="49">???</span></p>
          <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Som Tam Shaker Fries">
            <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
          </button>
@@ -770,8 +770,8 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 03</p>
        <h2 class="display d-md kinetic">Mango Sticky Rice McFlurry</h2>
        <p class="thai reveal" style="--i:1">แมงโก้ข้าวเหนียว McFlurry</p>
-       <div class="price-reveal reveal" style="--i:1" data-price="45">
-         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+       <div class="price-reveal reveal" style="--i:1">
+         <p class="price"><span class="cur">฿</span><span class="price-val" data-price="45">???</span></p>
          <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Mango Sticky Rice McFlurry">
            <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
          </button>
@@ -819,8 +819,8 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 04 · McCafé</p>
        <h2 class="display d-md kinetic">Thai Iced Green Milk Tea</h2>
        <p class="thai reveal" style="--i:1">ชาเขียวนมเย็น</p>
-       <div class="price-reveal reveal" style="--i:1" data-price="39">
-         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+       <div class="price-reveal reveal" style="--i:1">
+         <p class="price"><span class="cur">฿</span><span class="price-val" data-price="39">???</span></p>
          <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Thai Iced Green Milk Tea">
            <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
          </button>
@@ -835,15 +835,18 @@ button{touch-action:manipulation}
       <p class="eyebrow reveal" style="color:var(--yellow)">Pricing · built for a price-sensitive market</p>
       <h2 class="display d-lg kinetic">The Menu</h2>
       <div class="menu" style="margin-top:clamp(22px,4vw,40px)"><div class="menu__item reveal-l" style="--i:0">
-      <span class="nm">Tom Yum Goong Crispy Chicken Burger</span><span class="pr">฿<span class="" data-count="79">0</span></span></div><div class="menu__item reveal-l" style="--i:1">
-      <span class="nm">Som Tam Shaker Fries</span><span class="pr">฿<span class="" data-count="49">0</span></span></div><div class="menu__item reveal-l" style="--i:2">
-      <span class="nm">Mango Sticky Rice McFlurry</span><span class="pr">฿<span class="" data-count="45">0</span></span></div><div class="menu__item reveal-l" style="--i:3">
-      <span class="nm">Thai Iced Green Milk Tea</span><span class="pr">฿<span class="" data-count="39">0</span></span></div></div>
+      <span class="nm">Tom Yum Goong Crispy Chicken Burger</span><span class="pr">฿<span class="price-val" data-price="79">???</span></span></div><div class="menu__item reveal-l" style="--i:1">
+      <span class="nm">Som Tam Shaker Fries</span><span class="pr">฿<span class="price-val" data-price="49">???</span></span></div><div class="menu__item reveal-l" style="--i:2">
+      <span class="nm">Mango Sticky Rice McFlurry</span><span class="pr">฿<span class="price-val" data-price="45">???</span></span></div><div class="menu__item reveal-l" style="--i:3">
+      <span class="nm">Thai Iced Green Milk Tea</span><span class="pr">฿<span class="price-val" data-price="39">???</span></span></div></div>
+      <button type="button" class="btn btn--solid price-btn menu-reveal-btn reveal" style="--i:1;margin-top:18px" aria-label="Reveal all prices">
+        <span class="ico" aria-hidden="true">🥠</span> เผยราคาทั้งหมด · Reveal all prices
+      </button>
       <div class="combo reveal-pop">
         <div>
           <p class="tag" style="font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.7">The value anchor</p>
-          <div class="big">THE ZAAB SET<br>฿<span class="" data-count="149">0</span></div>
-          <p class="small" style="margin-top:8px">Burger + Shaker Fries + Drink. Add the Mango Sticky Rice McFlurry for just <b>+฿29</b>.</p>
+          <div class="big">THE ZAAB SET<br>฿<span class="price-val" data-price="149">???</span></div>
+          <p class="small" style="margin-top:8px">Burger + Shaker Fries + Drink. Add the Mango Sticky Rice McFlurry for just <b>+฿<span class="price-val" data-price="29">??</span></b>.</p>
         </div>
         <span class="chip" style="border-width:2px">Burger + Fries + Drink</span>
       </div>
@@ -1230,30 +1233,42 @@ button{touch-action:manipulation}
   }
 
   /* ---------- 8c. Price reveal (เซียมซี-style roll, locked price) ---------- */
+  // Roll random digits on a .price-val then lock onto its real data-price.
+  function rollPrice(val, withRoll) {
+    if (val.dataset.revealed) return;
+    val.dataset.revealed = '1';
+    var target = parseInt(val.getAttribute('data-price'), 10) || 0;
+    function finish() {
+      val.classList.remove('rolling');
+      val.textContent = String(target);          // always the locked price
+      val.classList.add('revealed');
+    }
+    if (!withRoll) { finish(); return; }
+    val.classList.add('rolling');
+    var t0 = Date.now();
+    var iv = setInterval(function () {
+      val.textContent = String(Math.floor(Math.random() * 90) + 10);  // suspense only
+      if (Date.now() - t0 > 1100) { clearInterval(iv); finish(); }
+    }, 60);
+  }
+
+  // per-product button: reveal its own price
   [].forEach.call(doc.querySelectorAll('.price-reveal'), function (wrap) {
     var btn = wrap.querySelector('.price-btn');
-    var price = wrap.querySelector('.price');
     var val = wrap.querySelector('.price-val');
-    var target = parseInt(wrap.getAttribute('data-price'), 10) || 0;
-    if (!btn || !price || !val) return;
-    var done = false;
-    function finish() {
-      price.classList.remove('rolling');
-      val.textContent = String(target);          // always the locked price
-      price.classList.add('revealed');
-      wrap.classList.add('done');
-    }
+    if (!btn || !val) return;
     btn.addEventListener('click', function () {
-      if (done) return;
-      done = true;
-      btn.disabled = true;
-      if (reduceMotion) { finish(); return; }
-      price.classList.add('rolling');
-      var t0 = Date.now();
-      var iv = setInterval(function () {
-        val.textContent = String(Math.floor(Math.random() * 90) + 10);  // suspense only
-        if (Date.now() - t0 > 1100) { clearInterval(iv); finish(); }
-      }, 60);
+      btn.classList.add('is-done'); btn.disabled = true;
+      rollPrice(val, !reduceMotion);
+    });
+  });
+
+  // menu "reveal all" button: reveal every price in its panel at once
+  [].forEach.call(doc.querySelectorAll('.menu-reveal-btn'), function (btn) {
+    var scope = btn.closest('.panel') || doc;
+    btn.addEventListener('click', function () {
+      btn.classList.add('is-done'); btn.disabled = true;
+      [].forEach.call(scope.querySelectorAll('.price-val'), function (v) { rollPrice(v, !reduceMotion); });
     });
   });
 
