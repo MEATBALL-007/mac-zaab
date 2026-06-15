@@ -32,7 +32,7 @@ body{
   background:var(--paper);
   color:var(--ink);
   font-family:var(--body);
-  font-size:clamp(15px,1.05vw,18px);
+  font-size:clamp(16px,1.15vw,20px);
   line-height:1.55;
   letter-spacing:.005em;
   overflow-x:hidden;
@@ -516,6 +516,73 @@ button{touch-action:manipulation}
 .dots button{width:16px;height:16px;border-width:2px}
 /* keep the side nav bars comfortably tappable */
 .nav-btn{width:46px;height:46px;font-size:20px}
+
+/* ============================================================
+   Added sections — charts, competitor table, persona, roadmap,
+   references, and the "open on your phone" CTA.
+   ============================================================ */
+
+/* --- Data chart (Thai insights) --- */
+.chart{margin-top:clamp(24px,4vw,44px);background:rgba(0,0,0,.16);border-radius:var(--r-card);padding:clamp(18px,2.6vw,30px)}
+.chart__title{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:13px;margin:0 0 16px;opacity:.95}
+.chart__note{font-size:12px;opacity:.7;margin:14px 0 0}
+.bar{display:grid;grid-template-columns:minmax(96px,180px) 1fr auto;align-items:center;gap:12px;margin:10px 0}
+.bar__label{font-weight:700;font-size:14px}
+.bar__track{height:14px;border-radius:999px;background:rgba(255,255,255,.28);overflow:hidden}
+.bar__fill{display:block;height:100%;width:0;border-radius:999px;background:var(--yellow);transition:width 1.1s var(--ease)}
+.chart.in .bar__fill{width:var(--v)}
+.bar__val{font-family:var(--disp);font-size:17px;min-width:2.4ch;text-align:right}
+
+/* --- Competitor table --- */
+.cmp-wrap{overflow-x:auto;margin-top:clamp(20px,3vw,36px);border-radius:var(--r-card);box-shadow:var(--shadow);-webkit-overflow-scrolling:touch}
+.cmp{width:100%;border-collapse:collapse;background:var(--paper);min-width:580px}
+.cmp th,.cmp td{padding:14px 16px;text-align:center;border-bottom:1px solid rgba(26,26,26,.12)}
+.cmp th{font-weight:800;text-transform:uppercase;letter-spacing:.07em;font-size:12px;background:var(--ink);color:var(--paper)}
+.cmp .cmp__brand{text-align:left;font-weight:800;white-space:nowrap}
+.cmp tbody tr:last-child td{border-bottom:0}
+.cmp tr.is-hero{background:var(--yellow)}
+.cmp tr.is-hero .cmp__brand{color:var(--ink)}
+.cmp .rate{letter-spacing:3px;color:var(--red);font-size:14px}
+.cmp__spicy{font-weight:900;font-size:16px}
+
+/* --- Persona --- */
+.persona{margin-top:clamp(22px,3.5vw,40px);display:grid;gap:clamp(16px,2.6vw,28px)}
+.persona__id{display:flex;gap:20px;align-items:center;background:var(--cream);border:2px solid rgba(26,26,26,.1);border-radius:var(--r-card);padding:clamp(18px,2.4vw,28px);box-shadow:var(--shadow)}
+.persona__avatar{flex:none;width:clamp(64px,8vw,96px);height:clamp(64px,8vw,96px);border-radius:50%;display:grid;place-items:center;background:var(--red);color:#fff;font-family:var(--disp);font-size:clamp(34px,4vw,52px);line-height:1}
+.persona__name{font-family:var(--disp);text-transform:uppercase;font-size:clamp(24px,3vw,40px);line-height:1}
+.persona__meta{font-weight:700;opacity:.7;font-size:13px;letter-spacing:.04em;margin-top:4px}
+.persona__bio{margin:.5em 0 0;max-width:62ch}
+.persona__cols{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,24px)}
+.persona__col{background:var(--cream);border-radius:var(--r-card);padding:clamp(16px,2vw,24px);border:2px solid rgba(26,26,26,.1)}
+.persona__col h3{font-family:var(--disp);text-transform:uppercase;font-size:clamp(16px,1.8vw,22px);margin:0 0 .4em;letter-spacing:-.01em}
+.persona__col ul{margin:0;padding-left:1.1em}
+.persona__col li{margin:.4em 0;font-size:14px}
+@media (max-width:900px){.persona__cols{grid-template-columns:1fr}.persona__id{flex-direction:column;text-align:center}}
+
+/* --- Launch roadmap --- */
+.roadmap{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,28px);margin-top:clamp(24px,4vw,44px)}
+.phase{background:var(--ink);color:var(--paper);border-radius:var(--r-card);padding:clamp(18px,2.4vw,28px);box-shadow:var(--shadow)}
+.phase__no{font-family:var(--disp);font-size:clamp(34px,5vw,64px);line-height:.9;color:var(--yellow)}
+.phase__when{font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:11px;opacity:.7;margin-top:8px}
+.phase h3{font-family:var(--disp);text-transform:uppercase;font-size:clamp(20px,2.4vw,30px);margin:.1em 0 .5em;letter-spacing:-.01em}
+.phase ul{margin:0;padding-left:1.1em}
+.phase li{margin:.36em 0;font-size:14px}
+@media (max-width:900px){.roadmap{grid-template-columns:1fr}}
+
+/* --- References --- */
+.refs{list-style:none;margin:clamp(20px,3.5vw,40px) 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.refs li{display:flex;flex-direction:column;gap:2px;border-left:3px solid var(--yellow);padding-left:14px}
+.refs li b{font-size:clamp(15px,1.4vw,18px)}
+.refs li span{opacity:.82;font-size:14px}
+.refs__note{margin-top:22px;font-size:13px;opacity:.72;max-width:80ch}
+
+/* --- "Open on your phone" CTA (closing) --- */
+.cta-visit{display:inline-flex;flex-direction:column;gap:4px;align-items:center;margin-top:clamp(18px,3vw,30px);
+  text-decoration:none;background:#fff;color:var(--ink);border-radius:18px;padding:16px 26px;
+  box-shadow:var(--shadow);border:3px solid var(--ink);transition:transform .25s var(--ease)}
+.cta-visit:hover{transform:translateY(-3px)}
+.cta-visit__label{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:12px}
+.cta-visit__url{font-family:var(--disp);font-size:clamp(18px,2.4vw,30px);letter-spacing:.01em}
 
 /* ============================================================
    Price reveal — each hero product hides its price as "???" until

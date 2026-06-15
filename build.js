@@ -284,6 +284,12 @@ function insightsPanel() {
           <p class="lead" style="opacity:.95">Spicy-sour flavors lead · mango sticky rice is iconic · matcha &amp; iced green milk tea booming · delivery + limited-time drops drive demand.</p>
         </div>
       </div>
+      <div class="chart reveal" style="--i:1">
+        <p class="chart__title">Trending flavour &amp; drink demand — directional index</p>
+        ${[['Spicy-sour', 95], ['Matcha / green milk tea', 90], ['Mango sticky rice', 88], ['Som Tam', 80], ['Mala', 72]]
+          .map(([l, v]) => `<div class="bar"><span class="bar__label">${l}</span><span class="bar__track"><span class="bar__fill" style="--v:${v}%"></span></span><span class="bar__val">${v}</span></div>`).join('')}
+        <p class="chart__note">Directional index, based on 2025 delivery &amp; search trend reports.</p>
+      </div>
       ${marquee(['Spicy-Sour', 'Som Tam', 'Yum', 'Mala', 'Matcha', 'Mango Sticky Rice', 'Green Milk Tea'], { dur: 24 })}
       <p class="reveal" style="--i:1;font-weight:700;opacity:.82;font-size:13px;letter-spacing:.06em">Source: LINE MAN Wongnai 2025 trend report</p>
     </div>
@@ -367,6 +373,99 @@ function closingPanel() {
       ${marquee(['So Good', 'So Thai', 'MAC ZAAB', 'ZAAB DAI JAI'], { dur: 20 })}
       <h2 class="display d-xl kinetic thanks" style="margin-top:18px">Thank you</h2>
       <p class="display d-md reveal" style="--i:2;color:var(--yellow)">Questions?</p>
+      <a class="cta-visit reveal" style="--i:3" href="https://meatball-007.github.io/mac-zaab/" target="_blank" rel="noopener">
+        <span class="cta-visit__label">📱 See it live — open on your phone</span>
+        <span class="cta-visit__url">meatball-007.github.io/mac-zaab</span>
+      </a>
+    </div>
+  </section>`;
+}
+
+function personaPanel() {
+  const col = (t, arr, i) => `<div class="persona__col reveal" style="--i:${i}"><h3>${t}</h3><ul>${arr.map((x) => `<li>${x}</li>`).join('')}</ul></div>`;
+  return `<section class="panel panel--paper" aria-label="Target persona">
+    <span class="panel__index">06</span>
+    <div class="wrap">
+      <p class="eyebrow reveal">Target persona</p>
+      <h2 class="display d-md kinetic">Who we’re cooking for</h2>
+      <div class="persona">
+        <div class="persona__id reveal-pop">
+          <div class="persona__avatar" aria-hidden="true">B</div>
+          <div>
+            <div class="persona__name">“Bee”</div>
+            <div class="persona__meta">22 · Bangkok · Gen Z student / first-jobber</div>
+            <p class="persona__bio">Lives on delivery apps and TikTok, chases limited-edition drops, and loves loud spicy-sour flavours — but watches every baht.</p>
+          </div>
+        </div>
+        <div class="persona__cols">
+          ${col('Goals', ['Discover the next viral, limited-edition drop', 'Bold spicy-sour &amp; matcha flavours', 'Photogenic, shareable food for TikTok'], 0)}
+          ${col('Behaviours', ['Orders via Grab / LINE MAN 3–4× a week', 'Finds food on TikTok &amp; Reels first', 'Follows Thai food KOLs'], 1)}
+          ${col('Barriers', ['Tight budget — needs clear value', 'Skips brands that feel “not local”', 'Loses interest without novelty'], 2)}
+        </div>
+      </div>
+    </div>
+  </section>`;
+}
+
+function competitorsPanel() {
+  const dot = (n) => `<span class="rate">${'●'.repeat(n)}${'○'.repeat(3 - n)}</span>`;
+  const rows = [
+    ['MAC ZAAB (McDonald’s)', '฿฿', 3, 3, '✓', true],
+    ['KFC Thailand', '฿฿', 2, 2, '◐', false],
+    ['Burger King', '฿฿฿', 1, 2, '✗', false],
+    ['Local street food', '฿', 3, 1, '✓', false]
+  ].map(([n, price, local, digital, spicy, hero]) =>
+    `<tr class="${hero ? 'is-hero' : ''}"><td class="cmp__brand">${n}</td><td>${price}</td><td>${dot(local)}</td><td>${dot(digital)}</td><td class="cmp__spicy">${spicy}</td></tr>`).join('');
+  return `<section class="panel panel--cream" aria-label="Competitive landscape">
+    <span class="panel__index">07</span>
+    <div class="wrap">
+      <p class="eyebrow reveal">Competitive landscape</p>
+      <h2 class="display d-md kinetic">Where MAC ZAAB wins</h2>
+      <div class="cmp-wrap reveal" style="--i:1">
+        <table class="cmp">
+          <thead><tr><th>Brand</th><th>Price</th><th>Thai-local flavour</th><th>Digital &amp; delivery</th><th>Spicy-sour hero</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <p class="reveal" style="--i:2;opacity:.7;font-size:13px;margin-top:14px">● = relative strength · directional comparison for this case study</p>
+    </div>
+  </section>`;
+}
+
+function roadmapPanel() {
+  const phases = [
+    ['01', 'Tease', 'Weeks 1–2', ['TikTok / Reels teasers + food ASMR', 'Thai food KOL seeding', '“???” price-reveal teaser campaign']],
+    ['02', 'Launch', 'Weeks 3–4', ['CentralWorld &amp; Siam pop-up + free samples', 'App-exclusive first drop', '“Shake &amp; Sabai” TikTok challenge']],
+    ['03', 'Sustain', 'Weeks 5–8', ['Grab / LINE MAN delivery exclusives', 'Double loyalty points', 'Collectible cup &amp; merch drop']]
+  ].map(([no, t, w, items], i) => `<div class="phase reveal" style="--i:${i}">
+      <div class="phase__no">${no}</div>
+      <div class="phase__when">${w}</div>
+      <h3>${t}</h3>
+      <ul>${items.map((x) => `<li>${x}</li>`).join('')}</ul>
+    </div>`).join('');
+  return `<section class="panel panel--yellow" aria-label="Launch roadmap">
+    <span class="panel__index">15</span>
+    <div class="wrap">
+      <p class="eyebrow reveal">Go-to-market · timeline</p>
+      <h2 class="display d-md kinetic">Launch Roadmap</h2>
+      <div class="roadmap">${phases}</div>
+    </div>
+  </section>`;
+}
+
+function referencesPanel() {
+  const refs = [
+    ['LINE MAN Wongnai — 2025 Food Trend Report', 'Matcha / green-milk-tea surge and spicy-dish search demand.'],
+    ['McDonald’s Corporation — “Accelerating the Arches”', 'Global strategy focus on value, digital and delivery.'],
+    ['McDonald’s market menus', 'Glocalization examples — Maharaja Mac (India), Samurai Pork Burger (Thailand), Teriyaki McBurger (Japan), Bulgogi Burger (Korea).']
+  ].map((r, i) => `<li class="reveal-l" style="--i:${i}"><b>${r[0]}</b><span>${r[1]}</span></li>`).join('');
+  return `<section class="panel panel--ink" aria-label="References and sources">
+    <span class="panel__index">16</span>
+    <div class="wrap">
+      <p class="eyebrow reveal" style="color:var(--yellow)">References &amp; sources</p>
+      <h2 class="display d-md kinetic">References</h2>
+      <ul class="refs">${refs}</ul>
+      <p class="refs__note reveal" style="--i:1">MAC ZAAB is a fictional student concept created for this academic case study; the product line and prices are illustrative and some figures are directional. Not affiliated with, endorsed by, or sponsored by McDonald’s.</p>
     </div>
   </section>`;
 }
@@ -377,21 +476,30 @@ function buildHTML(build) {
     ? `\n  <script type="module" src="${MV_CDN}"></script>`
     : '';
 
-  const panels = [
+  const panelList = [
     heroPanel(),
     snapshotPanel(),
     swotPanel(),
     glocalPanel(),
     insightsPanel(),
+    personaPanel(),
+    competitorsPanel(),
     zaabIntroPanel(),
-    productPanel(build, PRODUCTS[0], 7),
-    productPanel(build, PRODUCTS[1], 8),
-    productPanel(build, PRODUCTS[2], 9),
-    productPanel(build, PRODUCTS[3], 10),
+    productPanel(build, PRODUCTS[0], 9),
+    productPanel(build, PRODUCTS[1], 10),
+    productPanel(build, PRODUCTS[2], 11),
+    productPanel(build, PRODUCTS[3], 12),
     pricingPanel(),
     planPanel(),
+    roadmapPanel(),
+    referencesPanel(),
     closingPanel()
-  ].join('\n');
+  ];
+  const total = panelList.length;
+  // auto-number the big faint panel index so it stays sequential
+  const panels = panelList
+    .map((html, i) => html.replace(/(<span class="panel__index">)[^<]*(<\/span>)/, `$1${pad(i + 1)}$2`))
+    .join('\n');
 
   let scripts;
   if (build === 'cdn') {
@@ -439,12 +547,12 @@ function buildHTML(build) {
 
   <nav class="slidenav slidenav--left" aria-hidden="true" aria-label="Slide navigation (left presenter)">
     <button class="nav-btn nav-prev" aria-label="Previous slide">‹</button>
-    <span class="count" title="Drag to move">1 / 13</span>
+    <span class="count" title="Drag to move">1 / ${total}</span>
     <button class="nav-btn nav-next" aria-label="Next slide">›</button>
   </nav>
   <nav class="slidenav slidenav--right" aria-hidden="true" aria-label="Slide navigation (right presenter)">
     <button class="nav-btn nav-prev" aria-label="Previous slide">‹</button>
-    <span class="count" title="Drag to move">1 / 13</span>
+    <span class="count" title="Drag to move">1 / ${total}</span>
     <button class="nav-btn nav-next" aria-label="Next slide">›</button>
   </nav>
   <div class="dots" aria-hidden="true"></div>
