@@ -524,9 +524,10 @@ button{touch-action:manipulation}
    ============================================================ */
 .price-reveal{margin:.15em 0 1.1em}
 .price-reveal .price{margin:0}
-.price-val{display:inline-block;min-width:2.2ch}
+.price-val{display:inline-block;min-width:1.8ch}
 .price-btn{margin-top:14px}
-.price.rolling .price-val{color:var(--red);animation:priceShake .11s steps(2) infinite}
+.price-btn.is-done{display:none}
+.price-val.rolling{color:var(--red);animation:priceShake .11s steps(2) infinite}
 @keyframes priceShake{
   0%{transform:translate(0,0) rotate(0)}
   25%{transform:translate(-2px,1px) rotate(-2.5deg)}
@@ -534,6 +535,5 @@ button{touch-action:manipulation}
   75%{transform:translate(-1px,2px) rotate(-1deg)}
   100%{transform:translate(1px,-2px) rotate(2deg)}
 }
-.price.revealed .price-val{animation:pricePop .6s var(--ease) both}
+.price-val.revealed{animation:pricePop .6s var(--ease) both}
 @keyframes pricePop{0%{transform:scale(.4);opacity:.15}55%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
-.price-reveal.done .price-btn{display:none}

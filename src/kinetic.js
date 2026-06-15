@@ -352,30 +352,42 @@
   }
 
   /* ---------- 8c. Price reveal (เซียมซี-style roll, locked price) ---------- */
+  // Roll random digits on a .price-val then lock onto its real data-price.
+  function rollPrice(val, withRoll) {
+    if (val.dataset.revealed) return;
+    val.dataset.revealed = '1';
+    var target = parseInt(val.getAttribute('data-price'), 10) || 0;
+    function finish() {
+      val.classList.remove('rolling');
+      val.textContent = String(target);          // always the locked price
+      val.classList.add('revealed');
+    }
+    if (!withRoll) { finish(); return; }
+    val.classList.add('rolling');
+    var t0 = Date.now();
+    var iv = setInterval(function () {
+      val.textContent = String(Math.floor(Math.random() * 90) + 10);  // suspense only
+      if (Date.now() - t0 > 1100) { clearInterval(iv); finish(); }
+    }, 60);
+  }
+
+  // per-product button: reveal its own price
   [].forEach.call(doc.querySelectorAll('.price-reveal'), function (wrap) {
     var btn = wrap.querySelector('.price-btn');
-    var price = wrap.querySelector('.price');
     var val = wrap.querySelector('.price-val');
-    var target = parseInt(wrap.getAttribute('data-price'), 10) || 0;
-    if (!btn || !price || !val) return;
-    var done = false;
-    function finish() {
-      price.classList.remove('rolling');
-      val.textContent = String(target);          // always the locked price
-      price.classList.add('revealed');
-      wrap.classList.add('done');
-    }
+    if (!btn || !val) return;
     btn.addEventListener('click', function () {
-      if (done) return;
-      done = true;
-      btn.disabled = true;
-      if (reduceMotion) { finish(); return; }
-      price.classList.add('rolling');
-      var t0 = Date.now();
-      var iv = setInterval(function () {
-        val.textContent = String(Math.floor(Math.random() * 90) + 10);  // suspense only
-        if (Date.now() - t0 > 1100) { clearInterval(iv); finish(); }
-      }, 60);
+      btn.classList.add('is-done'); btn.disabled = true;
+      rollPrice(val, !reduceMotion);
+    });
+  });
+
+  // menu "reveal all" button: reveal every price in its panel at once
+  [].forEach.call(doc.querySelectorAll('.menu-reveal-btn'), function (btn) {
+    var scope = btn.closest('.panel') || doc;
+    btn.addEventListener('click', function () {
+      btn.classList.add('is-done'); btn.disabled = true;
+      [].forEach.call(scope.querySelectorAll('.price-val'), function (v) { rollPrice(v, !reduceMotion); });
     });
   });
 
