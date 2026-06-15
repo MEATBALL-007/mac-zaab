@@ -164,4 +164,7 @@ network or file fetches.
 - **Anton** display font — SIL Open Font License (Google Fonts).
 - **Three.js** (r137) — MIT.
 - **`<model-viewer>`** — Apache-2.0 (loaded from CDN in the CDN build only).
-- No real brand logos are used in any custom artwork.
+- **McDonald’s Golden Arches** — an original SVG rendition is shown in the title
+  section solely for this educational case study (nominative / fair-use academic
+  context). It is **not for commercial use** and is not affiliated with, endorsed
+  by, or sponsored by McDonald’s.

@@ -346,6 +346,32 @@
     }
   });
 
+  /* ---------- 8b. Interactive brand mark (Golden Arches) ---------- */
+  var brand = doc.getElementById('brandmark');
+  if (brand) {
+    var arch = brand.querySelector('.arches');
+    brand.addEventListener('pointermove', function (e) {
+      if (reduceMotion) return;
+      var r = brand.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      brand.style.setProperty('--ry', (px * 26).toFixed(1) + 'deg');
+      brand.style.setProperty('--rx', (-py * 26).toFixed(1) + 'deg');
+    });
+    brand.addEventListener('pointerleave', function () {
+      brand.style.setProperty('--ry', '0deg');
+      brand.style.setProperty('--rx', '0deg');
+    });
+    var flip = function () { brand.classList.remove('spin'); void brand.offsetWidth; brand.classList.add('spin'); };
+    brand.addEventListener('click', flip);
+    brand.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
+    });
+    brand.addEventListener('animationend', function (e) {
+      if (e.animationName === 'archSpin') brand.classList.remove('spin');
+    });
+  }
+
   /* ---------- 9. Init ---------- */
   observeAll();
   // reveal whatever is already on-screen at load

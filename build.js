@@ -158,6 +158,13 @@ function heroPanel() {
   return `<section class="panel panel--ink panel--center" aria-label="Title">
     <span class="panel__index">01</span>
     <div class="wrap">
+      <div class="brandmark reveal-pop" id="brandmark" tabindex="0" role="img"
+           aria-label="McDonald's Golden Arches — shown for educational case-study purposes. Click or tap to flip.">
+        <svg class="arches" viewBox="0 0 240 190" aria-hidden="true" focusable="false">
+          <path d="M35 175 L35 75 C35 15 95 15 120 70 C145 15 205 15 205 75 L205 175 L160 175 C160 120 120 120 120 95 C120 120 80 120 80 175 Z"/>
+        </svg>
+      </div>
+      <p class="brandmark__note reveal">McDonald’s Golden Arches · used for education — not for sale</p>
       <p class="eyebrow reveal">McDonald’s · Thailand</p>
       <h1 class="display d-xl kinetic">Marketing Strategy &amp; SWOT</h1>
       <p class="lead reveal" style="--i:1">A real-world case study, a localized hero product, and a full Thai-market launch plan — built around <b>MAC ZAAB</b>.</p>
