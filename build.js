@@ -473,10 +473,15 @@ function buildHTML(build) {
     </div>
   </div>
 
-  <nav class="slidenav" aria-hidden="true" aria-label="Slide navigation">
-    <button id="prevSlide" class="nav-btn" aria-label="Previous slide">‹</button>
-    <span class="count">1 / 13</span>
-    <button id="nextSlide" class="nav-btn" aria-label="Next slide">›</button>
+  <nav class="slidenav slidenav--left" aria-hidden="true" aria-label="Slide navigation (left presenter)">
+    <button class="nav-btn nav-prev" aria-label="Previous slide">‹</button>
+    <span class="count" title="Drag to move">1 / 13</span>
+    <button class="nav-btn nav-next" aria-label="Next slide">›</button>
+  </nav>
+  <nav class="slidenav slidenav--right" aria-hidden="true" aria-label="Slide navigation (right presenter)">
+    <button class="nav-btn nav-prev" aria-label="Previous slide">‹</button>
+    <span class="count" title="Drag to move">1 / 13</span>
+    <button class="nav-btn nav-next" aria-label="Next slide">›</button>
   </nav>
   <div class="dots" aria-hidden="true"></div>
 
