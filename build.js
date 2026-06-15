@@ -127,7 +127,12 @@ function productPanel(build, p, n) {
        <p class="eyebrow reveal">${p.eyebrow}</p>
        <h2 class="display d-md kinetic">${p.title}</h2>
        ${thai}
-       <p class="price reveal" style="--i:1"><span class="cur">฿</span>${num(p.price)}</p>
+       <div class="price-reveal reveal" style="--i:1" data-price="${p.price}">
+         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+         <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for ${p.title}">
+           <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
+         </button>
+       </div>
        <p class="product__desc reveal" style="--i:2">${p.desc}</p>
        <div class="ingredients reveal" style="--i:3">${p.ing.map((x) => `<span class="chip">${x}</span>`).join('')}</div>
      </div>`;

@@ -524,6 +524,27 @@ button{touch-action:manipulation}
 /* keep the side nav bars comfortably tappable */
 .nav-btn{width:46px;height:46px;font-size:20px}
 
+/* ============================================================
+   Price reveal — each hero product hides its price as "???" until
+   the button is pressed; it then "rolls" like a เซียมซี / slot
+   before locking onto the real (fixed) price.
+   ============================================================ */
+.price-reveal{margin:.15em 0 1.1em}
+.price-reveal .price{margin:0}
+.price-val{display:inline-block;min-width:2.2ch}
+.price-btn{margin-top:14px}
+.price.rolling .price-val{color:var(--red);animation:priceShake .11s steps(2) infinite}
+@keyframes priceShake{
+  0%{transform:translate(0,0) rotate(0)}
+  25%{transform:translate(-2px,1px) rotate(-2.5deg)}
+  50%{transform:translate(2px,-1px) rotate(1.5deg)}
+  75%{transform:translate(-1px,2px) rotate(-1deg)}
+  100%{transform:translate(1px,-2px) rotate(2deg)}
+}
+.price.revealed .price-val{animation:pricePop .6s var(--ease) both}
+@keyframes pricePop{0%{transform:scale(.4);opacity:.15}55%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+.price-reveal.done .price-btn{display:none}
+
 </style>
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 </head>
@@ -683,7 +704,12 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 01 · Hero</p>
        <h2 class="display d-md kinetic">Tom Yum Goong Crispy Chicken Burger</h2>
        <p class="thai reveal" style="--i:1">เบอร์เกอร์ไก่กรอบต้มยำกุ้ง</p>
-       <p class="price reveal" style="--i:1"><span class="cur">฿</span><span class="" data-count="79">0</span></p>
+       <div class="price-reveal reveal" style="--i:1" data-price="79">
+         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+         <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Tom Yum Goong Crispy Chicken Burger">
+           <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
+         </button>
+       </div>
        <p class="product__desc reveal" style="--i:2">A crispy chicken thigh drenched in creamy tom-yum sauce, finished with a shrimp-cracker crunch. Hits Thailand’s #1 spicy-sour craving.</p>
        <div class="ingredients reveal" style="--i:3"><span class="chip">crispy chicken thigh</span><span class="chip">creamy tom-yum sauce</span><span class="chip">lemongrass &amp; kaffir lime</span><span class="chip">galangal</span><span class="chip">chili</span><span class="chip">shrimp-cracker crunch</span></div>
      </div><div class="product__stage reveal-pop" data-parallax="0.05">
@@ -727,7 +753,12 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 02</p>
        <h2 class="display d-md kinetic">Som Tam Shaker Fries</h2>
        <p class="thai reveal" style="--i:1">เฟรนช์ฟรายส์ส้มตำ</p>
-       <p class="price reveal" style="--i:1"><span class="cur">฿</span><span class="" data-count="49">0</span></p>
+       <div class="price-reveal reveal" style="--i:1" data-price="49">
+         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+         <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Som Tam Shaker Fries">
+           <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
+         </button>
+       </div>
        <p class="product__desc reveal" style="--i:2">Shake your own papaya-salad seasoning over hot fries — chili, lime, peanut, dried shrimp, palm sugar. Interactive and built for TikTok.</p>
        <div class="ingredients reveal" style="--i:3"><span class="chip">world-famous fries</span><span class="chip">chili</span><span class="chip">lime</span><span class="chip">peanut</span><span class="chip">dried shrimp</span><span class="chip">palm sugar dust</span></div>
      </div></div></div>
@@ -739,7 +770,12 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 03</p>
        <h2 class="display d-md kinetic">Mango Sticky Rice McFlurry</h2>
        <p class="thai reveal" style="--i:1">แมงโก้ข้าวเหนียว McFlurry</p>
-       <p class="price reveal" style="--i:1"><span class="cur">฿</span><span class="" data-count="45">0</span></p>
+       <div class="price-reveal reveal" style="--i:1" data-price="45">
+         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+         <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Mango Sticky Rice McFlurry">
+           <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
+         </button>
+       </div>
        <p class="product__desc reveal" style="--i:2">Vanilla soft-serve swirled with real mango purée, sweet coconut sauce, and a toasted sticky-rice crunch — the iconic Thai dessert, multisensory.</p>
        <div class="ingredients reveal" style="--i:3"><span class="chip">vanilla soft-serve</span><span class="chip">mango purée</span><span class="chip">coconut sauce</span><span class="chip">toasted rice crunch</span></div>
      </div><div class="product__stage reveal-pop" data-parallax="0.05">
@@ -783,7 +819,12 @@ button{touch-action:manipulation}
        <p class="eyebrow reveal">MAC ZAAB · 04 · McCafé</p>
        <h2 class="display d-md kinetic">Thai Iced Green Milk Tea</h2>
        <p class="thai reveal" style="--i:1">ชาเขียวนมเย็น</p>
-       <p class="price reveal" style="--i:1"><span class="cur">฿</span><span class="" data-count="39">0</span></p>
+       <div class="price-reveal reveal" style="--i:1" data-price="39">
+         <p class="price"><span class="cur">฿</span><span class="price-val">???</span></p>
+         <button type="button" class="btn btn--solid price-btn" aria-label="Reveal the price for Thai Iced Green Milk Tea">
+           <span class="ico" aria-hidden="true">🥠</span> เผยราคา · Reveal price
+         </button>
+       </div>
        <p class="product__desc reveal" style="--i:2">McCafé’s take on the drink that overtook black coffee in Thailand — riding the matcha / green-milk-tea wave as an everyday “affordable luxury.”</p>
        <div class="ingredients reveal" style="--i:3"><span class="chip">green tea</span><span class="chip">fresh milk</span><span class="chip">lightly sweet</span><span class="chip">iced</span></div>
      </div></div></div>
@@ -1187,6 +1228,34 @@ button{touch-action:manipulation}
       if (e.animationName === 'archSpin') brand.classList.remove('spin');
     });
   }
+
+  /* ---------- 8c. Price reveal (เซียมซี-style roll, locked price) ---------- */
+  [].forEach.call(doc.querySelectorAll('.price-reveal'), function (wrap) {
+    var btn = wrap.querySelector('.price-btn');
+    var price = wrap.querySelector('.price');
+    var val = wrap.querySelector('.price-val');
+    var target = parseInt(wrap.getAttribute('data-price'), 10) || 0;
+    if (!btn || !price || !val) return;
+    var done = false;
+    function finish() {
+      price.classList.remove('rolling');
+      val.textContent = String(target);          // always the locked price
+      price.classList.add('revealed');
+      wrap.classList.add('done');
+    }
+    btn.addEventListener('click', function () {
+      if (done) return;
+      done = true;
+      btn.disabled = true;
+      if (reduceMotion) { finish(); return; }
+      price.classList.add('rolling');
+      var t0 = Date.now();
+      var iv = setInterval(function () {
+        val.textContent = String(Math.floor(Math.random() * 90) + 10);  // suspense only
+        if (Date.now() - t0 > 1100) { clearInterval(iv); finish(); }
+      }, 60);
+    });
+  });
 
   /* ---------- 9. Init ---------- */
   observeAll();
