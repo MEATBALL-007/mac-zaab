@@ -18,7 +18,8 @@
   var armed = true, firing = false, fired = false, curIdx = 0;
   var timer = null, overlay = null;
   var DELAY = 5000;     // time on the last slide before it fires
-  var DURATION = 2600;  // how long the scene stays before returning
+  var DURATION = 2600;  // how long the end scene stays before returning
+  var INTRO = 3000;     // opening "cold open" length on page load
 
   function reduced() { return body.classList.contains('reduce-motion'); }
 
@@ -108,15 +109,18 @@
   }
   function cancel() { clearTimeout(timer); timer = null; }
 
-  function fire() {
-    if (firing || fired || !armed || !onLast()) return;
-    firing = true; fired = true;             // one-shot per page load
+  function runScene(duration, skippable) {
+    if (firing) return;
+    firing = true;
     buildOverlay();
     body.classList.add('backrooms-on');
     startHum();
-    setTimeout(end, DURATION);
+    var to = setTimeout(endScene, duration);
+    if (skippable && overlay) {
+      overlay.addEventListener('pointerdown', function () { clearTimeout(to); endScene(); }, { once: true });
+    }
   }
-  function end() {
+  function endScene() {
     stopHum();
     if (overlay) overlay.classList.add('br--out');
     setTimeout(function () {
@@ -124,6 +128,12 @@
       body.classList.remove('backrooms-on');
       firing = false;
     }, 650);
+  }
+
+  function fire() {
+    if (firing || fired || !armed || !onLast()) return;
+    fired = true;                            // one-shot per page load
+    runScene(DURATION, false);
   }
 
   /* ---------- secret arm / disarm: type "boo" ---------- */
@@ -150,4 +160,9 @@
   doc.addEventListener('mz:reveal', function (e) {
     if (e.detail && e.detail.panel === lastPanel) schedule(); else cancel();
   });
+
+  /* ---------- opening cold-open: flash the backrooms on load ---------- */
+  function intro() { runScene(INTRO, true); }    // tap/click to skip (also unlocks audio)
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', intro);
+  else intro();
 })();
