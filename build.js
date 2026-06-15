@@ -28,6 +28,7 @@ const kineticJS = read(path.join(SRC, 'kinetic.js'));
 const mvInitJS = read(path.join(SRC, 'mv-init.js'));
 const threeViewerJS = read(path.join(SRC, 'three-viewer.js'));
 const soundJS = read(path.join(SRC, 'sound.js'));
+const prankJS = read(path.join(SRC, 'prank.js'));
 
 const THREE_LIB = read(path.join(ASSETS, 'three.min.js'));
 const GLTF_LIB = read(path.join(ASSETS, 'GLTFLoader.js'));
@@ -411,7 +412,7 @@ function buildHTML(build) {
   let scripts;
   if (build === 'cdn') {
     scripts =
-      `<script>\n${kineticJS}\n</script>\n<script>\n${mvInitJS}\n</script>\n<script>\n${soundJS}\n</script>`;
+      `<script>\n${kineticJS}\n</script>\n<script>\n${mvInitJS}\n</script>\n<script>\n${soundJS}\n</script>\n<script>\n${prankJS}\n</script>`;
   } else {
     const modelsObj = PRODUCTS.map((p) => `"${p.key}":"${b64(path.join(MODELS, p.file))}"`).join(',\n');
     scripts =
@@ -422,7 +423,8 @@ function buildHTML(build) {
       `<script>window.MZ_MODELS={\n${modelsObj}\n};</script>\n` +
       `<script>\n${threeViewerJS}\n</script>\n` +
       `<script>\n${kineticJS}\n</script>\n` +
-      `<script>\n${soundJS}\n</script>`;
+      `<script>\n${soundJS}\n</script>\n` +
+      `<script>\n${prankJS}\n</script>`;
   }
 
   return `<!doctype html>
@@ -449,19 +451,26 @@ function buildHTML(build) {
     <span class="chapter__no"></span><span class="chapter__clip"><span class="chapter__t"></span></span>
   </div>
 
-  <div class="controls">
-    <button id="motionToggle" class="ctrl-btn ctrl-btn--motion" aria-pressed="true" title="Toggle animations (A)">
-      <span class="ico" aria-hidden="true">✦</span><span class="lbl">Motion: On</span>
-    </button>
-    <button id="cinemaToggle" class="ctrl-btn ctrl-btn--cinema" aria-pressed="true" title="Toggle cinematic film treatment (C)">
-      <span class="ico" aria-hidden="true">🎬</span><span class="lbl">Cinema: On</span>
-    </button>
-    <button id="soundToggle" class="ctrl-btn ctrl-btn--sound" aria-pressed="false" title="Toggle sound design (S)">
-      <span class="ico" aria-hidden="true">♪</span><span class="lbl">Sound: Off</span>
-    </button>
-    <button id="modeToggle" class="ctrl-btn" aria-pressed="false" title="Toggle Scroll / Slide mode (M)">
-      <span class="ico" aria-hidden="true">▦</span><span class="lbl">Slide mode</span>
-    </button>
+  <div class="controls" id="toolwin">
+    <div class="toolwin__bar" id="toolwinBar">
+      <span class="toolwin__grip" aria-hidden="true">⠿</span>
+      <span class="toolwin__title">Controls</span>
+      <button id="toolwinMin" class="toolwin__min" aria-label="Show or hide controls" title="Show / hide">–</button>
+    </div>
+    <div class="toolwin__body">
+      <button id="motionToggle" class="ctrl-btn ctrl-btn--motion" aria-pressed="true" title="Toggle animations (A)">
+        <span class="ico" aria-hidden="true">✦</span><span class="lbl">Motion: On</span>
+      </button>
+      <button id="cinemaToggle" class="ctrl-btn ctrl-btn--cinema" aria-pressed="true" title="Toggle cinematic film treatment (C)">
+        <span class="ico" aria-hidden="true">🎬</span><span class="lbl">Cinema: On</span>
+      </button>
+      <button id="soundToggle" class="ctrl-btn ctrl-btn--sound" aria-pressed="false" title="Toggle sound design (S)">
+        <span class="ico" aria-hidden="true">♪</span><span class="lbl">Sound: Off</span>
+      </button>
+      <button id="modeToggle" class="ctrl-btn" aria-pressed="false" title="Toggle Scroll / Slide mode (M)">
+        <span class="ico" aria-hidden="true">▦</span><span class="lbl">Slide mode</span>
+      </button>
+    </div>
   </div>
 
   <nav class="slidenav" aria-hidden="true" aria-label="Slide navigation">
