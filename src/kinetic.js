@@ -332,6 +332,41 @@
   if (cinemaBtn) cinemaBtn.addEventListener('click', function () { setCinema(!cinema); });
   applyCinema();   // sync initial state (cinema on)
 
+  /* ---------- 7d. Tool window: draggable + collapsible controls ---------- */
+  var toolwin = doc.getElementById('toolwin');
+  var toolBar = doc.getElementById('toolwinBar');
+  var toolMin = doc.getElementById('toolwinMin');
+  if (toolwin && toolBar) {
+    var dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    toolBar.addEventListener('pointerdown', function (e) {
+      if (e.target === toolMin) return;          // let the collapse button click through
+      var r = toolwin.getBoundingClientRect();
+      // switch to top/left positioning so we can move it freely
+      toolwin.style.left = r.left + 'px';
+      toolwin.style.top = r.top + 'px';
+      toolwin.style.right = 'auto';
+      toolwin.style.bottom = 'auto';
+      dragging = true; sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top;
+      try { toolBar.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    toolBar.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var w = toolwin.offsetWidth, h = toolwin.offsetHeight;
+      var nx = Math.max(4, Math.min(window.innerWidth - w - 4, ox + (e.clientX - sx)));
+      var ny = Math.max(4, Math.min(window.innerHeight - h - 4, oy + (e.clientY - sy)));
+      toolwin.style.left = nx + 'px';
+      toolwin.style.top = ny + 'px';
+    });
+    function endDrag(e) { if (dragging) { dragging = false; try { toolBar.releasePointerCapture(e.pointerId); } catch (err) {} } }
+    toolBar.addEventListener('pointerup', endDrag);
+    toolBar.addEventListener('pointercancel', endDrag);
+    if (toolMin) toolMin.addEventListener('click', function () {
+      var collapsed = toolwin.classList.toggle('collapsed');
+      toolMin.textContent = collapsed ? '+' : '–';
+      toolMin.setAttribute('aria-label', collapsed ? 'Show controls' : 'Hide controls');
+    });
+  }
+
   /* ---------- 8. Keyboard ---------- */
   doc.addEventListener('keydown', function (e) {
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;

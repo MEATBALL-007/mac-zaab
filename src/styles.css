@@ -305,19 +305,38 @@ a{color:inherit}
 /* ============================================================
    Controls (mode toggle, slide nav)
    ============================================================ */
+/* Floating, draggable, collapsible "tool window" (bottom-left so it
+   stays within reach on a tall TV; drag by the title bar, collapse
+   with the – button). JS sets left/top once it has been dragged. */
 .controls{
-  position:fixed;z-index:60;top:16px;right:16px;
-  display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:min(92vw,460px);
+  position:fixed;z-index:60;left:16px;bottom:16px;
+  width:min(86vw,212px);
+  background:rgba(26,26,26,.92);border:2px solid var(--ink);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden;touch-action:none;
 }
+.toolwin__bar{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:grab;
+  background:rgba(255,255,255,.07);user-select:none;
+}
+.toolwin__bar:active{cursor:grabbing}
+.toolwin__grip{color:var(--paper);opacity:.55;font-size:14px;line-height:1}
+.toolwin__title{flex:1;font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--yellow)}
+.toolwin__min{
+  width:26px;height:26px;border-radius:7px;border:0;background:var(--paper);color:var(--ink);
+  font-weight:900;font-size:16px;line-height:1;display:grid;place-items:center;flex:none;
+}
+.toolwin__body{display:flex;flex-direction:column;gap:8px;padding:10px}
+.controls.collapsed{width:auto}
+.controls.collapsed .toolwin__body{display:none}
 .ctrl-btn{
-  display:inline-flex;align-items:center;gap:.5em;
+  display:inline-flex;align-items:center;gap:.5em;width:100%;justify-content:flex-start;
   background:var(--ink);color:var(--paper);
-  border:2px solid var(--ink);border-radius:999px;
+  border:2px solid rgba(255,255,255,.18);border-radius:999px;
   font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:12px;
-  padding:10px 16px;box-shadow:var(--shadow);
+  padding:10px 16px;
   transition:transform .2s var(--ease),background .2s,color .2s;
 }
-.ctrl-btn:hover{transform:translateY(-2px)}
+.ctrl-btn:hover{transform:translateX(2px)}
 .ctrl-btn .ico{font-size:1.1em;line-height:1}
 .ctrl-btn[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
 /* Motion toggle has its own states (not the red "mode active" look) */
@@ -408,7 +427,7 @@ body.mode-slide .panel__index{opacity:.08}
 @media (max-width:560px){
   .g-3,.g-4,.stats-row{grid-template-columns:1fr}
   .teaser .tcard{margin-inline:-6vw}
-  .controls{top:10px;right:10px}
+  .controls{left:10px;bottom:10px}
   .ctrl-btn{padding:9px 12px;font-size:11px}
   .combo{flex-direction:column;align-items:flex-start}
 }
@@ -583,3 +602,84 @@ body.reduce-motion .stage-frame{animation:none !important}
 .brandmark__note{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.5;margin:0 0 22px}
 body:not(.reduce-motion) .brandmark .arches{animation:archBob 4.6s ease-in-out infinite}
 @keyframes archBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+/* ============================================================
+   "BACKROOMS" prank scene (liminal / A24 vibe) — armed via a
+   secret key, fires at the end of the deck, then returns. Pure
+   CSS + inline-SVG grain, so the offline file:// build still works.
+   No faces, no text — atmosphere + flicker + VHS only.
+   ============================================================ */
+body.backrooms-on{cursor:none}
+.br{
+  position:fixed;inset:0;z-index:99999;overflow:hidden;background:#9c8d33;
+  filter:saturate(1.18) contrast(1.07);
+  animation:brIn .22s ease both;
+}
+.br.br--out{opacity:0;transition:opacity .6s ease}
+@keyframes brIn{from{opacity:0}to{opacity:1}}
+
+/* camera sway (found-footage handheld) + fast shake (separate layers) */
+.br__cam{position:absolute;inset:-5%}
+.br__shake{position:absolute;inset:0}
+body:not(.reduce-motion) .br__cam{animation:brSway 7s ease-in-out infinite}
+body:not(.reduce-motion) .br__shake{animation:brShake .2s steps(2,end) infinite}
+@keyframes brSway{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(1.1%,-.8%) rotate(.3deg)}50%{transform:translate(-.8%,1%) rotate(-.2deg)}75%{transform:translate(.6%,.4%) rotate(.15deg)}}
+@keyframes brShake{0%{transform:translate(0,0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-3px)}80%{transform:translate(2px,3px)}100%{transform:translate(0,0)}}
+
+/* one-point-perspective corridor built from clip-path trapezoids */
+.br__scene{position:absolute;inset:0;background:#b3a23a}
+.br__scene>div{position:absolute;inset:0}
+.br__ceiling{background:linear-gradient(#cfc169,#a99a3c);clip-path:polygon(0 0,100% 0,68% 33%,32% 33%)}
+.br__floor{background:linear-gradient(#7d7128,#9a8c34);clip-path:polygon(0 100%,100% 100%,68% 67%,32% 67%)}
+.br__wall-l{background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 7px,transparent 7px 16px),linear-gradient(90deg,#8a7c2e,#5f5520);clip-path:polygon(0 0,32% 33%,32% 67%,0 100%)}
+.br__wall-r{background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 7px,transparent 7px 16px),linear-gradient(270deg,#8a7c2e,#5f5520);clip-path:polygon(100% 0,68% 33%,68% 67%,100% 100%)}
+.br__back{position:absolute;left:32%;top:33%;width:36%;height:34%;
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 8px,transparent 8px 18px),linear-gradient(#9c8d33,#7d7026);
+  box-shadow:inset 0 0 60px rgba(0,0,0,.45)}
+
+/* receding fluorescent ceiling panels (flicker) */
+.br__light{position:absolute;left:50%;transform:translateX(-50%);background:#fbf4c0;border-radius:2px;
+  box-shadow:0 0 26px 7px rgba(255,246,190,.75)}
+.br__light.l1{top:6%;width:16%;height:2.4%}
+.br__light.l2{top:14%;width:11%;height:1.9%}
+.br__light.l3{top:21%;width:7.5%;height:1.4%}
+.br__light.l4{top:27%;width:4.5%;height:1%}
+body:not(.reduce-motion) .br__light{animation:brFlick 3.1s steps(1) infinite}
+.br__light.l2{animation-delay:.6s}
+.br__light.l3{animation-delay:1.3s}
+.br__light.l4{animation-delay:.9s}
+@keyframes brFlick{0%,100%{opacity:1}7%{opacity:.35}9%{opacity:1}54%{opacity:1}56%{opacity:.18}58%{opacity:.9}81%{opacity:1}83%{opacity:.5}85%{opacity:1}}
+
+/* VHS / TV overlays (steady, not shaken) */
+.br__grain{position:absolute;inset:-50%;opacity:.13;mix-blend-mode:overlay;background-size:180px 180px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+body:not(.reduce-motion) .br__grain{animation:cineGrain 1.2s steps(5) infinite}
+.br__scan{position:absolute;inset:0;mix-blend-mode:multiply;opacity:.5;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
+.br__vig{position:absolute;inset:0;background:radial-gradient(120% 92% at 50% 45%,transparent 44%,rgba(0,0,0,.72) 100%)}
+.br__flicker{position:absolute;inset:0;background:#000;opacity:0}
+body:not(.reduce-motion) .br__flicker{animation:brBlackFlick 5s steps(1) infinite}
+@keyframes brBlackFlick{0%,100%{opacity:0}48%{opacity:0}49%{opacity:.5}50%{opacity:0}77%{opacity:0}78%{opacity:.32}79%{opacity:0}}
+
+/* VHS tracking band sweeping up the frame (90s handcam) */
+.br__track{position:absolute;left:0;right:0;top:110%;height:9%;opacity:.5;mix-blend-mode:screen;filter:blur(1px);
+  background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.22),rgba(255,255,255,0))}
+body:not(.reduce-motion) .br__track{animation:brTrack 6s linear infinite}
+@keyframes brTrack{0%{top:110%}100%{top:-20%}}
+
+/* old camcorder HUD: REC, battery, timestamp (90s handcam UI, no scary text) */
+.br__hud{position:absolute;inset:0;font-family:'Courier New',monospace;color:#f6f6f6;
+  text-shadow:0 0 4px rgba(0,0,0,.85);opacity:.92}
+.br__rec{position:absolute;top:5%;right:6%;display:flex;align-items:center;gap:8px;
+  font-size:clamp(12px,1.6vw,18px);letter-spacing:.14em}
+.br__rec b{width:.7em;height:.7em;border-radius:50%;background:#ff2a2a;display:inline-block;box-shadow:0 0 8px #ff2a2a}
+body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
+@keyframes recBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.br__bat{position:absolute;top:5%;left:6%;font-size:clamp(11px,1.4vw,16px);letter-spacing:.1em}
+.br__time{position:absolute;bottom:5%;left:6%;font-size:clamp(12px,1.6vw,18px);letter-spacing:.08em}
+
+/* tiny presenter-only toast confirming armed/disarmed (not shown to the friend) */
+.prank-toast{position:fixed;left:14px;bottom:14px;z-index:100000;pointer-events:none;
+  background:rgba(0,0,0,.82);color:#ffd23c;font-family:var(--body);font-weight:800;
+  font-size:12px;letter-spacing:.08em;padding:8px 13px;border-radius:10px;
+  opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}
+.prank-toast.show{opacity:1;transform:none}
