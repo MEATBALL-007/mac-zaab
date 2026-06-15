@@ -100,21 +100,25 @@ gh api -X POST repos/{owner}/mac-zaab/pages -f "source[branch]=main" -f "source[
   here only if you prefer a still version.
 - Keyboard focus is visible; layout is responsive down to mobile.
 
-## Section flow (13 panels)
+## Section flow (17 panels)
 
 1. Hero / title + fanned product teaser
 2. Company snapshot (count-up stats)
 3. SWOT (2×2, Thai lens)
 4. Glocalization research (scattered region cards)
-5. Thai consumer insights (big stats + source)
-6. MAC ZAAB intro (hero reveal)
-7. **3D** — Tom Yum Goong Crispy Chicken Burger (hero)
-8. **3D** — Som Tam Shaker Fries
-9. **3D** — Mango Sticky Rice McFlurry
-10. **3D** — Thai Iced Green Milk Tea
-11. Pricing + ZAAB Set combo
-12. Marketing plan (slogan + channels + events)
-13. Closing / takeaways
+5. Thai consumer insights (big stats + directional demand chart)
+6. Target persona (Gen Z Thai consumer)
+7. Competitive landscape (comparison table)
+8. MAC ZAAB intro (hero reveal)
+9. **3D** — Tom Yum Goong Crispy Chicken Burger (hero)
+10. **3D** — Som Tam Shaker Fries
+11. **3D** — Mango Sticky Rice McFlurry
+12. **3D** — Thai Iced Green Milk Tea
+13. Pricing + ZAAB Set combo (tap to reveal prices)
+14. Marketing plan (slogan + channels + events)
+15. Launch roadmap (phased timeline)
+16. References & sources
+17. Closing / takeaways + "open on your phone" link
 
 ## Project structure
 

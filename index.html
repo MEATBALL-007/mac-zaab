@@ -39,7 +39,7 @@ body{
   background:var(--paper);
   color:var(--ink);
   font-family:var(--body);
-  font-size:clamp(15px,1.05vw,18px);
+  font-size:clamp(16px,1.15vw,20px);
   line-height:1.55;
   letter-spacing:.005em;
   overflow-x:hidden;
@@ -525,6 +525,73 @@ button{touch-action:manipulation}
 .nav-btn{width:46px;height:46px;font-size:20px}
 
 /* ============================================================
+   Added sections — charts, competitor table, persona, roadmap,
+   references, and the "open on your phone" CTA.
+   ============================================================ */
+
+/* --- Data chart (Thai insights) --- */
+.chart{margin-top:clamp(24px,4vw,44px);background:rgba(0,0,0,.16);border-radius:var(--r-card);padding:clamp(18px,2.6vw,30px)}
+.chart__title{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:13px;margin:0 0 16px;opacity:.95}
+.chart__note{font-size:12px;opacity:.7;margin:14px 0 0}
+.bar{display:grid;grid-template-columns:minmax(96px,180px) 1fr auto;align-items:center;gap:12px;margin:10px 0}
+.bar__label{font-weight:700;font-size:14px}
+.bar__track{height:14px;border-radius:999px;background:rgba(255,255,255,.28);overflow:hidden}
+.bar__fill{display:block;height:100%;width:0;border-radius:999px;background:var(--yellow);transition:width 1.1s var(--ease)}
+.chart.in .bar__fill{width:var(--v)}
+.bar__val{font-family:var(--disp);font-size:17px;min-width:2.4ch;text-align:right}
+
+/* --- Competitor table --- */
+.cmp-wrap{overflow-x:auto;margin-top:clamp(20px,3vw,36px);border-radius:var(--r-card);box-shadow:var(--shadow);-webkit-overflow-scrolling:touch}
+.cmp{width:100%;border-collapse:collapse;background:var(--paper);min-width:580px}
+.cmp th,.cmp td{padding:14px 16px;text-align:center;border-bottom:1px solid rgba(26,26,26,.12)}
+.cmp th{font-weight:800;text-transform:uppercase;letter-spacing:.07em;font-size:12px;background:var(--ink);color:var(--paper)}
+.cmp .cmp__brand{text-align:left;font-weight:800;white-space:nowrap}
+.cmp tbody tr:last-child td{border-bottom:0}
+.cmp tr.is-hero{background:var(--yellow)}
+.cmp tr.is-hero .cmp__brand{color:var(--ink)}
+.cmp .rate{letter-spacing:3px;color:var(--red);font-size:14px}
+.cmp__spicy{font-weight:900;font-size:16px}
+
+/* --- Persona --- */
+.persona{margin-top:clamp(22px,3.5vw,40px);display:grid;gap:clamp(16px,2.6vw,28px)}
+.persona__id{display:flex;gap:20px;align-items:center;background:var(--cream);border:2px solid rgba(26,26,26,.1);border-radius:var(--r-card);padding:clamp(18px,2.4vw,28px);box-shadow:var(--shadow)}
+.persona__avatar{flex:none;width:clamp(64px,8vw,96px);height:clamp(64px,8vw,96px);border-radius:50%;display:grid;place-items:center;background:var(--red);color:#fff;font-family:var(--disp);font-size:clamp(34px,4vw,52px);line-height:1}
+.persona__name{font-family:var(--disp);text-transform:uppercase;font-size:clamp(24px,3vw,40px);line-height:1}
+.persona__meta{font-weight:700;opacity:.7;font-size:13px;letter-spacing:.04em;margin-top:4px}
+.persona__bio{margin:.5em 0 0;max-width:62ch}
+.persona__cols{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,24px)}
+.persona__col{background:var(--cream);border-radius:var(--r-card);padding:clamp(16px,2vw,24px);border:2px solid rgba(26,26,26,.1)}
+.persona__col h3{font-family:var(--disp);text-transform:uppercase;font-size:clamp(16px,1.8vw,22px);margin:0 0 .4em;letter-spacing:-.01em}
+.persona__col ul{margin:0;padding-left:1.1em}
+.persona__col li{margin:.4em 0;font-size:14px}
+@media (max-width:900px){.persona__cols{grid-template-columns:1fr}.persona__id{flex-direction:column;text-align:center}}
+
+/* --- Launch roadmap --- */
+.roadmap{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.4vw,28px);margin-top:clamp(24px,4vw,44px)}
+.phase{background:var(--ink);color:var(--paper);border-radius:var(--r-card);padding:clamp(18px,2.4vw,28px);box-shadow:var(--shadow)}
+.phase__no{font-family:var(--disp);font-size:clamp(34px,5vw,64px);line-height:.9;color:var(--yellow)}
+.phase__when{font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:11px;opacity:.7;margin-top:8px}
+.phase h3{font-family:var(--disp);text-transform:uppercase;font-size:clamp(20px,2.4vw,30px);margin:.1em 0 .5em;letter-spacing:-.01em}
+.phase ul{margin:0;padding-left:1.1em}
+.phase li{margin:.36em 0;font-size:14px}
+@media (max-width:900px){.roadmap{grid-template-columns:1fr}}
+
+/* --- References --- */
+.refs{list-style:none;margin:clamp(20px,3.5vw,40px) 0 0;padding:0;display:flex;flex-direction:column;gap:14px}
+.refs li{display:flex;flex-direction:column;gap:2px;border-left:3px solid var(--yellow);padding-left:14px}
+.refs li b{font-size:clamp(15px,1.4vw,18px)}
+.refs li span{opacity:.82;font-size:14px}
+.refs__note{margin-top:22px;font-size:13px;opacity:.72;max-width:80ch}
+
+/* --- "Open on your phone" CTA (closing) --- */
+.cta-visit{display:inline-flex;flex-direction:column;gap:4px;align-items:center;margin-top:clamp(18px,3vw,30px);
+  text-decoration:none;background:#fff;color:var(--ink);border-radius:18px;padding:16px 26px;
+  box-shadow:var(--shadow);border:3px solid var(--ink);transition:transform .25s var(--ease)}
+.cta-visit:hover{transform:translateY(-3px)}
+.cta-visit__label{font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:12px}
+.cta-visit__url{font-family:var(--disp);font-size:clamp(18px,2.4vw,30px);letter-spacing:.01em}
+
+/* ============================================================
    Price reveal — each hero product hides its price as "???" until
    the button is pressed; it then "rolls" like a เซียมซี / slot
    before locking onto the real (fixed) price.
@@ -568,12 +635,12 @@ button{touch-action:manipulation}
 
   <nav class="slidenav slidenav--left" aria-hidden="true" aria-label="Slide navigation (left presenter)">
     <button class="nav-btn nav-prev" aria-label="Previous slide">‹</button>
-    <span class="count" title="Drag to move">1 / 13</span>
+    <span class="count" title="Drag to move">1 / 17</span>
     <button class="nav-btn nav-next" aria-label="Next slide">›</button>
   </nav>
   <nav class="slidenav slidenav--right" aria-hidden="true" aria-label="Slide navigation (right presenter)">
     <button class="nav-btn nav-prev" aria-label="Previous slide">‹</button>
-    <span class="count" title="Drag to move">1 / 13</span>
+    <span class="count" title="Drag to move">1 / 17</span>
     <button class="nav-btn nav-next" aria-label="Next slide">›</button>
   </nav>
   <div class="dots" aria-hidden="true"></div>
@@ -680,13 +747,54 @@ button{touch-action:manipulation}
           <p class="lead" style="opacity:.95">Spicy-sour flavors lead · mango sticky rice is iconic · matcha &amp; iced green milk tea booming · delivery + limited-time drops drive demand.</p>
         </div>
       </div>
+      <div class="chart reveal" style="--i:1">
+        <p class="chart__title">Trending flavour &amp; drink demand — directional index</p>
+        <div class="bar"><span class="bar__label">Spicy-sour</span><span class="bar__track"><span class="bar__fill" style="--v:95%"></span></span><span class="bar__val">95</span></div><div class="bar"><span class="bar__label">Matcha / green milk tea</span><span class="bar__track"><span class="bar__fill" style="--v:90%"></span></span><span class="bar__val">90</span></div><div class="bar"><span class="bar__label">Mango sticky rice</span><span class="bar__track"><span class="bar__fill" style="--v:88%"></span></span><span class="bar__val">88</span></div><div class="bar"><span class="bar__label">Som Tam</span><span class="bar__track"><span class="bar__fill" style="--v:80%"></span></span><span class="bar__val">80</span></div><div class="bar"><span class="bar__label">Mala</span><span class="bar__track"><span class="bar__fill" style="--v:72%"></span></span><span class="bar__val">72</span></div>
+        <p class="chart__note">Directional index, based on 2025 delivery &amp; search trend reports.</p>
+      </div>
       <div class="marquee  " aria-hidden="true">
     <div class="marquee__track" style="--dur:24s"><span>Spicy-Sour<span class="star">✦</span></span><span>Som Tam<span class="star">✦</span></span><span>Yum<span class="star">✦</span></span><span>Mala<span class="star">✦</span></span><span>Matcha<span class="star">✦</span></span><span>Mango Sticky Rice<span class="star">✦</span></span><span>Green Milk Tea<span class="star">✦</span></span></div></div>
       <p class="reveal" style="--i:1;font-weight:700;opacity:.82;font-size:13px;letter-spacing:.06em">Source: LINE MAN Wongnai 2025 trend report</p>
     </div>
   </section>
-<section class="panel panel--ink panel--center" aria-label="MAC ZAAB introduction">
+<section class="panel panel--paper" aria-label="Target persona">
     <span class="panel__index">06</span>
+    <div class="wrap">
+      <p class="eyebrow reveal">Target persona</p>
+      <h2 class="display d-md kinetic">Who we’re cooking for</h2>
+      <div class="persona">
+        <div class="persona__id reveal-pop">
+          <div class="persona__avatar" aria-hidden="true">B</div>
+          <div>
+            <div class="persona__name">“Bee”</div>
+            <div class="persona__meta">22 · Bangkok · Gen Z student / first-jobber</div>
+            <p class="persona__bio">Lives on delivery apps and TikTok, chases limited-edition drops, and loves loud spicy-sour flavours — but watches every baht.</p>
+          </div>
+        </div>
+        <div class="persona__cols">
+          <div class="persona__col reveal" style="--i:0"><h3>Goals</h3><ul><li>Discover the next viral, limited-edition drop</li><li>Bold spicy-sour &amp; matcha flavours</li><li>Photogenic, shareable food for TikTok</li></ul></div>
+          <div class="persona__col reveal" style="--i:1"><h3>Behaviours</h3><ul><li>Orders via Grab / LINE MAN 3–4× a week</li><li>Finds food on TikTok &amp; Reels first</li><li>Follows Thai food KOLs</li></ul></div>
+          <div class="persona__col reveal" style="--i:2"><h3>Barriers</h3><ul><li>Tight budget — needs clear value</li><li>Skips brands that feel “not local”</li><li>Loses interest without novelty</li></ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+<section class="panel panel--cream" aria-label="Competitive landscape">
+    <span class="panel__index">07</span>
+    <div class="wrap">
+      <p class="eyebrow reveal">Competitive landscape</p>
+      <h2 class="display d-md kinetic">Where MAC ZAAB wins</h2>
+      <div class="cmp-wrap reveal" style="--i:1">
+        <table class="cmp">
+          <thead><tr><th>Brand</th><th>Price</th><th>Thai-local flavour</th><th>Digital &amp; delivery</th><th>Spicy-sour hero</th></tr></thead>
+          <tbody><tr class="is-hero"><td class="cmp__brand">MAC ZAAB (McDonald’s)</td><td>฿฿</td><td><span class="rate">●●●</span></td><td><span class="rate">●●●</span></td><td class="cmp__spicy">✓</td></tr><tr class=""><td class="cmp__brand">KFC Thailand</td><td>฿฿</td><td><span class="rate">●●○</span></td><td><span class="rate">●●○</span></td><td class="cmp__spicy">◐</td></tr><tr class=""><td class="cmp__brand">Burger King</td><td>฿฿฿</td><td><span class="rate">●○○</span></td><td><span class="rate">●●○</span></td><td class="cmp__spicy">✗</td></tr><tr class=""><td class="cmp__brand">Local street food</td><td>฿</td><td><span class="rate">●●●</span></td><td><span class="rate">●○○</span></td><td class="cmp__spicy">✓</td></tr></tbody>
+        </table>
+      </div>
+      <p class="reveal" style="--i:2;opacity:.7;font-size:13px;margin-top:14px">● = relative strength · directional comparison for this case study</p>
+    </div>
+  </section>
+<section class="panel panel--ink panel--center" aria-label="MAC ZAAB introduction">
+    <span class="panel__index">08</span>
     <div class="wrap" style="text-align:center">
       <p class="eyebrow reveal" style="color:var(--yellow)">The Hero Product</p>
       <h2 class="display d-xl kinetic" style="color:var(--yellow)">MAC ZAAB</h2>
@@ -697,7 +805,7 @@ button{touch-action:manipulation}
     </div>
   </section>
 <section class="panel panel--paper" aria-label="MAC ZAAB product: Tom Yum Goong Crispy Chicken Burger">
-    <span class="panel__index">07</span>
+    <span class="panel__index">09</span>
     <div class="wrap"><div class="product "><div class="product__copy">
        <div class="hero-badge reveal"><span class="chip chip--fill">Limited Edition · Thailand Exclusive</span></div>
        <p class="eyebrow reveal">MAC ZAAB · 01 · Hero</p>
@@ -721,7 +829,7 @@ button{touch-action:manipulation}
      </div></div></div>
   </section>
 <section class="panel panel--yellow" aria-label="MAC ZAAB product: Som Tam Shaker Fries">
-    <span class="panel__index">08</span>
+    <span class="panel__index">10</span>
     <div class="wrap"><div class="product product--rev"><div class="product__stage reveal-pop" data-parallax="0.05">
        <div class="stage-frame" style="--stage:linear-gradient(160deg,#fff3c4,#ffd966)"><div class="viewer3d" data-model="fries" data-spin="#spin-fries"><canvas></canvas><div class="viewer3d__loading">Loading 3D…</div></div></div>
        <div class="stage-tools">
@@ -745,7 +853,7 @@ button{touch-action:manipulation}
      </div></div></div>
   </section>
 <section class="panel panel--cream" aria-label="MAC ZAAB product: Mango Sticky Rice McFlurry">
-    <span class="panel__index">09</span>
+    <span class="panel__index">11</span>
     <div class="wrap"><div class="product "><div class="product__copy">
        
        <p class="eyebrow reveal">MAC ZAAB · 03</p>
@@ -769,7 +877,7 @@ button{touch-action:manipulation}
      </div></div></div>
   </section>
 <section class="panel panel--ink" aria-label="MAC ZAAB product: Thai Iced Green Milk Tea">
-    <span class="panel__index">10</span>
+    <span class="panel__index">12</span>
     <div class="wrap"><div class="product product--rev"><div class="product__stage reveal-pop" data-parallax="0.05">
        <div class="stage-frame" style="--stage:linear-gradient(160deg,#1f3a2a,#2c5138)"><div class="viewer3d" data-model="frappe" data-spin="#spin-frappe"><canvas></canvas><div class="viewer3d__loading">Loading 3D…</div></div></div>
        <div class="stage-tools">
@@ -793,7 +901,7 @@ button{touch-action:manipulation}
      </div></div></div>
   </section>
 <section class="panel panel--ink" aria-label="Pricing and combo">
-    <span class="panel__index">11</span>
+    <span class="panel__index">13</span>
     <div class="wrap">
       <p class="eyebrow reveal" style="color:var(--yellow)">Pricing · built for a price-sensitive market</p>
       <h2 class="display d-lg kinetic">The Menu</h2>
@@ -816,7 +924,7 @@ button{touch-action:manipulation}
     </div>
   </section>
 <section class="panel panel--paper" aria-label="Marketing plan">
-    <span class="panel__index">12</span>
+    <span class="panel__index">14</span>
     <div class="wrap">
       <p class="eyebrow reveal">Go-to-market · Thailand</p>
       <h2 class="display d-md kinetic">Marketing Plan</h2>
@@ -827,8 +935,40 @@ button{touch-action:manipulation}
       <div class="plan"><div class="card reveal" style="--i:0"><span class="tag">Strategy</span><h3>Positioning</h3><p>“Global brand, Thai heart.” Localize flavor &amp; value while keeping the trusted global system.</p></div><div class="card reveal" style="--i:1"><span class="tag">Reach</span><h3>Channels</h3><p>TikTok &amp; Reels — food ASMR + Thai food KOLs (lead) · LINE Official Account — coupons &amp; loyalty · Delivery apps — Grab / LINE MAN exclusives · Out-of-home — near schools &amp; BTS/MRT</p></div><div class="card reveal" style="--i:2"><span class="tag">Activation</span><h3>Events</h3><p>Pop-up launch at CentralWorld / Siam (free samples) · “Shake &amp; Sabai” TikTok challenge (meal prizes) · Collectible cup &amp; merch drop · Double loyalty points for two weeks</p></div></div>
     </div>
   </section>
+<section class="panel panel--yellow" aria-label="Launch roadmap">
+    <span class="panel__index">15</span>
+    <div class="wrap">
+      <p class="eyebrow reveal">Go-to-market · timeline</p>
+      <h2 class="display d-md kinetic">Launch Roadmap</h2>
+      <div class="roadmap"><div class="phase reveal" style="--i:0">
+      <div class="phase__no">01</div>
+      <div class="phase__when">Weeks 1–2</div>
+      <h3>Tease</h3>
+      <ul><li>TikTok / Reels teasers + food ASMR</li><li>Thai food KOL seeding</li><li>“???” price-reveal teaser campaign</li></ul>
+    </div><div class="phase reveal" style="--i:1">
+      <div class="phase__no">02</div>
+      <div class="phase__when">Weeks 3–4</div>
+      <h3>Launch</h3>
+      <ul><li>CentralWorld &amp; Siam pop-up + free samples</li><li>App-exclusive first drop</li><li>“Shake &amp; Sabai” TikTok challenge</li></ul>
+    </div><div class="phase reveal" style="--i:2">
+      <div class="phase__no">03</div>
+      <div class="phase__when">Weeks 5–8</div>
+      <h3>Sustain</h3>
+      <ul><li>Grab / LINE MAN delivery exclusives</li><li>Double loyalty points</li><li>Collectible cup &amp; merch drop</li></ul>
+    </div></div>
+    </div>
+  </section>
+<section class="panel panel--ink" aria-label="References and sources">
+    <span class="panel__index">16</span>
+    <div class="wrap">
+      <p class="eyebrow reveal" style="color:var(--yellow)">References &amp; sources</p>
+      <h2 class="display d-md kinetic">References</h2>
+      <ul class="refs"><li class="reveal-l" style="--i:0"><b>LINE MAN Wongnai — 2025 Food Trend Report</b><span>Matcha / green-milk-tea surge and spicy-dish search demand.</span></li><li class="reveal-l" style="--i:1"><b>McDonald’s Corporation — “Accelerating the Arches”</b><span>Global strategy focus on value, digital and delivery.</span></li><li class="reveal-l" style="--i:2"><b>McDonald’s market menus</b><span>Glocalization examples — Maharaja Mac (India), Samurai Pork Burger (Thailand), Teriyaki McBurger (Japan), Bulgogi Burger (Korea).</span></li></ul>
+      <p class="refs__note reveal" style="--i:1">MAC ZAAB is a fictional student concept created for this academic case study; the product line and prices are illustrative and some figures are directional. Not affiliated with, endorsed by, or sponsored by McDonald’s.</p>
+    </div>
+  </section>
 <section class="panel panel--red panel--center" aria-label="Closing and takeaways">
-    <span class="panel__index">13</span>
+    <span class="panel__index">17</span>
     <div class="wrap">
       <p class="eyebrow reveal">In summary</p>
       <h2 class="display d-md kinetic">Key Takeaways</h2>
@@ -837,6 +977,10 @@ button{touch-action:manipulation}
     <div class="marquee__track" style="--dur:20s"><span>So Good<span class="star">✦</span></span><span>So Thai<span class="star">✦</span></span><span>MAC ZAAB<span class="star">✦</span></span><span>ZAAB DAI JAI<span class="star">✦</span></span></div></div>
       <h2 class="display d-xl kinetic thanks" style="margin-top:18px">Thank you</h2>
       <p class="display d-md reveal" style="--i:2;color:var(--yellow)">Questions?</p>
+      <a class="cta-visit reveal" style="--i:3" href="https://meatball-007.github.io/mac-zaab/" target="_blank" rel="noopener">
+        <span class="cta-visit__label">📱 See it live — open on your phone</span>
+        <span class="cta-visit__url">meatball-007.github.io/mac-zaab</span>
+      </a>
     </div>
   </section>
   </main>
