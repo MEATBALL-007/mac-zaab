@@ -6990,12 +6990,12 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
 </script>
 <script>
 /* ============================================================
-   MAC ZAAB — "Backrooms" end-of-deck prank (opt-in, hidden)
-   Armed by a secret key sequence (type "boo"); default OFF so
-   it never fires during rehearsal. When armed and the final
-   slide has been on screen for a few seconds, the page glitches
-   into a liminal / 90s-handcam backrooms scene with a low
-   fluorescent hum, then returns to the closing slide.
+   MAC ZAAB — "Backrooms" end-of-deck prank (auto)
+   Auto-armed: when the final slide has been on screen for 5s, the
+   page glitches into a liminal / 90s-handcam backrooms scene with a
+   low fluorescent hum, then returns to the closing slide.
+   Type the secret "boo" to disable it (e.g. during rehearsal) and
+   "boo" again to re-enable.
    Pure CSS scene + procedural Web Audio => offline file://-safe.
    ============================================================ */
 (function () {
@@ -7006,9 +7006,9 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   var lastPanel = panels[panels.length - 1];
   var lastIdx = panels.length - 1;
 
-  var armed = false, firing = false, curIdx = 0;
+  var armed = true, firing = false, fired = false, curIdx = 0;
   var timer = null, overlay = null;
-  var DELAY = 3500;     // time on the last slide before it fires (3â€“5s range)
+  var DELAY = 5000;     // time on the last slide before it fires
   var DURATION = 2600;  // how long the scene stays before returning
 
   function reduced() { return body.classList.contains('reduce-motion'); }
@@ -7093,15 +7093,15 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   }
 
   function schedule() {
-    if (!armed || firing) return;
+    if (!armed || firing || fired) return;
     clearTimeout(timer);
     if (onLast()) timer = setTimeout(fire, DELAY);
   }
   function cancel() { clearTimeout(timer); timer = null; }
 
   function fire() {
-    if (firing || !armed || !onLast()) return;
-    firing = true; armed = false;            // one-shot; re-arm with "boo"
+    if (firing || fired || !armed || !onLast()) return;
+    firing = true; fired = true;             // one-shot per page load
     buildOverlay();
     body.classList.add('backrooms-on');
     startHum();
@@ -7120,7 +7120,8 @@ body:not(.reduce-motion) .br__rec b{animation:recBlink 1s steps(1) infinite}
   /* ---------- secret arm / disarm: type "boo" ---------- */
   function toggleArm() {
     armed = !armed;
-    showToast(armed ? '👻 armed — รอสไลด์สุดท้าย' : '⏹ prank off');
+    if (armed) fired = false;                // allow another run after re-enabling
+    showToast(armed ? '👻 prank: AUTO (on)' : '⏹ prank: off');
     if (armed) schedule(); else cancel();
   }
   var seq = '';
